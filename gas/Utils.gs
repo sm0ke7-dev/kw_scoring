@@ -1,5 +1,8 @@
 /** Utilities for sheet IO, normalization, joins, and logging */
 
+// Light highlight for computed output columns
+var OUTPUT_BG_COLOR = '#FFF2CC'; // pale yellow
+
 function getSheet(name) {
   const ss = getSpreadsheet();
   const sheet = ss.getSheetByName(name);
@@ -40,6 +43,13 @@ function writeColumnByHeader(sheet, headerName, values, headerRowIndex = 1) {
   const colValues = values.map(v => [v]);
   range.clearContent();
   range.setValues(colValues);
+  // shade output cells and header
+  try {
+    range.setBackground(OUTPUT_BG_COLOR);
+    sheet.getRange(headerRowIndex, colIndex + 1).setBackground(OUTPUT_BG_COLOR);
+  } catch (e) {
+    // ignore styling errors
+  }
 }
 
 function findHeaderIndex(sheet, name) {

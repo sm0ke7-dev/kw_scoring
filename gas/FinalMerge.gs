@@ -133,6 +133,13 @@ function runFinalMerge() {
   finalSheet.getRange(1, 1, 1, finalHeader.length).setValues([finalHeader]);
   if (outRows.length > 0) {
     finalSheet.getRange(2, 1, outRows.length, finalHeader.length).setValues(outRows);
+    // shade entire Final output table (all columns are outputs)
+    try {
+      var bg = OUTPUT_BG_COLOR || '#FFF2CC';
+      finalSheet.getRange(1, 1, outRows.length + 1, finalHeader.length).setBackground(bg);
+    } catch (e) {
+      // ignore styling errors
+    }
   }
 }
 
