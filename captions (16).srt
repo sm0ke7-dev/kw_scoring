@@ -1,0 +1,6324 @@
+1
+00:00:00,240 --> 00:00:06,720
+Check my geese control.
+
+2
+00:00:02,800 --> 00:00:09,360
+No geese. How about that?
+
+3
+00:00:06,720 --> 00:00:11,679
+Looks like they have new feces. Oh, none
+
+4
+00:00:09,360 --> 00:00:13,599
+of the Okay, cool.
+
+5
+00:00:11,679 --> 00:00:15,839
+All right. What a way to start the
+
+6
+00:00:13,599 --> 00:00:18,080
+video. Um
+
+7
+00:00:15,839 --> 00:00:20,000
+All right. So,
+
+8
+00:00:18,080 --> 00:00:22,640
+uh
+
+9
+00:00:20,000 --> 00:00:25,760
+basically, um I forgot what I was
+
+10
+00:00:22,640 --> 00:00:29,119
+leaving off there. What we want to do is
+
+11
+00:00:25,760 --> 00:00:31,199
+is you want to iteratively build this
+
+12
+00:00:29,119 --> 00:00:33,200
+script. So you're going to calculate one
+
+13
+00:00:31,199 --> 00:00:36,160
+score at a time or one set of scores at
+
+14
+00:00:33,200 --> 00:00:39,840
+a time and then you'll hold those in
+
+15
+00:00:36,160 --> 00:00:42,719
+memory. So but you'll also write them to
+
+16
+00:00:39,840 --> 00:00:44,719
+the sheet for auditing, right? So when
+
+17
+00:00:42,719 --> 00:00:46,160
+we calculate the location scores first,
+
+18
+00:00:44,719 --> 00:00:49,520
+you're going to write them in the sheet
+
+19
+00:00:46,160 --> 00:00:50,879
+as a as a step, right? But you're also
+
+20
+00:00:49,520 --> 00:00:52,399
+you're not going to go back and then
+
+21
+00:00:50,879 --> 00:00:54,879
+reference the sheet and pull that data
+
+22
+00:00:52,399 --> 00:00:56,399
+back in because every time you calculate
+
+23
+00:00:54,879 --> 00:00:59,120
+from the top, it should run all the
+
+24
+00:00:56,399 --> 00:01:00,800
+calculations again. So you're when you
+
+25
+00:00:59,120 --> 00:01:03,039
+write to the sheet, you're just saying
+
+26
+00:01:00,800 --> 00:01:05,519
+this is what we got here. And that helps
+
+27
+00:01:03,039 --> 00:01:07,520
+us audit it later, but you'll then take
+
+28
+00:01:05,519 --> 00:01:10,960
+those location scores and keep them in
+
+29
+00:01:07,520 --> 00:01:13,840
+memory um for the next operation and and
+
+30
+00:01:10,960 --> 00:01:16,000
+so on and so forth. Uh, so that's just
+
+31
+00:01:13,840 --> 00:01:18,080
+kind of a point I want to illustrate is
+
+32
+00:01:16,000 --> 00:01:20,799
+that you don't want to be as you you
+
+33
+00:01:18,080 --> 00:01:24,960
+don't want to write this all at once and
+
+34
+00:01:20,799 --> 00:01:27,520
+you don't want to um
+
+35
+00:01:24,960 --> 00:01:29,280
+you don't want to to to write something
+
+36
+00:01:27,520 --> 00:01:33,040
+and then have to go reference it to to
+
+37
+00:01:29,280 --> 00:01:35,680
+know what it is because you should be uh
+
+38
+00:01:33,040 --> 00:01:37,280
+handling all of these calculations step
+
+39
+00:01:35,680 --> 00:01:39,520
+by step by step by step in one
+
+40
+00:01:37,280 --> 00:01:42,079
+operation. But you are writing them out
+
+41
+00:01:39,520 --> 00:01:43,840
+to different areas for different scores.
+
+42
+00:01:42,079 --> 00:01:48,079
+And that's like a log or an audit of
+
+43
+00:01:43,840 --> 00:01:51,119
+what's going on. Um, so, uh, I need to
+
+44
+00:01:48,079 --> 00:01:54,320
+see a sheet you got currently with data
+
+45
+00:01:51,119 --> 00:01:56,880
+in it. Um,
+
+46
+00:01:54,320 --> 00:02:00,600
+let me send you the Tampa one.
+
+47
+00:01:56,880 --> 00:02:00,600
+Okay, sounds good.
+
+48
+00:02:15,920 --> 00:02:23,680
+Okay. And then what I'm going to do
+
+49
+00:02:21,120 --> 00:02:27,400
+is I'm going to create a new sheet.
+
+50
+00:02:23,680 --> 00:02:27,400
+Sheets new
+
+51
+00:02:27,840 --> 00:02:33,280
+just so we can get this organized.
+
+52
+00:02:31,680 --> 00:02:36,239
+Uh
+
+53
+00:02:33,280 --> 00:02:39,120
+rank whoops
+
+54
+00:02:36,239 --> 00:02:42,560
+score calculator. And eventually we will
+
+55
+00:02:39,120 --> 00:02:44,239
+merge the operations right from the one
+
+56
+00:02:42,560 --> 00:02:46,560
+you've written and and the one we're
+
+57
+00:02:44,239 --> 00:02:48,160
+about to work on.
+
+58
+00:02:46,560 --> 00:02:50,319
+Um
+
+59
+00:02:48,160 --> 00:02:55,400
+so
+
+60
+00:02:50,319 --> 00:02:55,400
+you've got ranking position ranking URL.
+
+61
+00:02:58,959 --> 00:03:02,800
+Oh, a lot of interesting areas here
+
+62
+00:03:00,720 --> 00:03:04,239
+where
+
+63
+00:03:02,800 --> 00:03:09,000
+he's not ranking so hot. There's an
+
+64
+00:03:04,239 --> 00:03:09,000
+Orlando raccoon one here. That's odd.
+
+65
+00:03:11,440 --> 00:03:18,400
+Definitely room for improvement.
+
+66
+00:03:14,640 --> 00:03:22,720
+A lot of wildlife questions here.
+
+67
+00:03:18,400 --> 00:03:26,000
+Um, so what I'm not seeing is you got
+
+68
+00:03:22,720 --> 00:03:29,120
+these sets here which are useful to
+
+69
+00:03:26,000 --> 00:03:31,599
+generate these, but I'm not seeing these
+
+70
+00:03:29,120 --> 00:03:36,000
+lined up on that other set, which I
+
+71
+00:03:31,599 --> 00:03:38,000
+would want to see just because
+
+72
+00:03:36,000 --> 00:03:41,120
+it's going to help you know how to
+
+73
+00:03:38,000 --> 00:03:42,400
+target the right My gosh, what is going
+
+74
+00:03:41,120 --> 00:03:43,760
+on?
+
+75
+00:03:42,400 --> 00:03:48,400
+It's going to help you know how to
+
+76
+00:03:43,760 --> 00:03:51,120
+target the right um
+
+77
+00:03:48,400 --> 00:03:54,159
+what I say going to help you know where
+
+78
+00:03:51,120 --> 00:03:57,760
+to target the right uh row when you want
+
+79
+00:03:54,159 --> 00:03:59,760
+to write and submit um some new stuff.
+
+80
+00:03:57,760 --> 00:04:01,439
+Right? So it looks like you're you're
+
+81
+00:03:59,760 --> 00:04:04,000
+dumping your results here, but I'm not
+
+82
+00:04:01,439 --> 00:04:07,040
+seeing a service geo keyword keyword
+
+83
+00:04:04,000 --> 00:04:08,959
+geo. I'm just seeing the keyword, which
+
+84
+00:04:07,040 --> 00:04:10,080
+is
+
+85
+00:04:08,959 --> 00:04:13,200
+sort of a different piece of the
+
+86
+00:04:10,080 --> 00:04:15,840
+operation, right? Um,
+
+87
+00:04:13,200 --> 00:04:17,840
+so what I want to see is something like
+
+88
+00:04:15,840 --> 00:04:19,600
+this,
+
+89
+00:04:17,840 --> 00:04:21,440
+but this is not just this is like
+
+90
+00:04:19,600 --> 00:04:23,440
+service level stuff. I guess this is
+
+91
+00:04:21,440 --> 00:04:28,840
+like your reference sheet for
+
+92
+00:04:23,440 --> 00:04:28,840
+for your ranking URLs, right? Um,
+
+93
+00:04:29,360 --> 00:04:34,880
+so let's go into here.
+
+94
+00:04:32,560 --> 00:04:35,280
+Oh, Gordon, can you share your screen?
+
+95
+00:04:34,880 --> 00:04:38,280
+Uh,
+
+96
+00:04:35,280 --> 00:04:38,280
+sorry.
+
+97
+00:04:42,000 --> 00:04:45,960
+So, what I really want to see
+
+98
+00:04:46,320 --> 00:04:49,880
+is this list.
+
+99
+00:04:50,000 --> 00:04:55,759
+We don't necessarily need the latitude,
+
+100
+00:04:52,320 --> 00:04:58,479
+longitude, though I think we can grab
+
+101
+00:04:55,759 --> 00:05:00,080
+them.
+
+102
+00:04:58,479 --> 00:05:03,080
+So, we're going to call this rankings,
+
+103
+00:05:00,080 --> 00:05:03,080
+right?
+
+104
+00:05:07,840 --> 00:05:14,000
+There's that.
+
+105
+00:05:10,400 --> 00:05:15,759
+And I'm going to come over here
+
+106
+00:05:14,000 --> 00:05:20,280
+and get the results, right? And these
+
+107
+00:05:15,759 --> 00:05:20,280
+should, I'm assuming, match up.
+
+108
+00:05:21,280 --> 00:05:27,240
+I think these raw responses are are kind
+
+109
+00:05:23,600 --> 00:05:27,240
+of what's killing it.
+
+110
+00:05:27,919 --> 00:05:32,680
+Yeah, I just clicked that like a minute
+
+111
+00:05:29,680 --> 00:05:32,680
+ago.
+
+112
+00:05:35,120 --> 00:05:40,639
+Come on. There we go. Good lord.
+
+113
+00:05:39,440 --> 00:05:42,000
+All right. And then we're going to come
+
+114
+00:05:40,639 --> 00:05:44,320
+here and we'll just assume it's
+
+115
+00:05:42,000 --> 00:05:46,639
+something like Oh [ __ ]
+
+116
+00:05:44,320 --> 00:05:49,680
+The hell happened? It took it It took so
+
+117
+00:05:46,639 --> 00:05:53,919
+long to copy that it actually pasted the
+
+118
+00:05:49,680 --> 00:05:56,320
+old thing and now it's not loading.
+
+119
+00:05:53,919 --> 00:05:59,680
+It's the raw responses. I think
+
+120
+00:05:56,320 --> 00:06:03,039
+Yeah, I think so, too.
+
+121
+00:05:59,680 --> 00:06:05,600
+Is it doing that to you? Uh, no not
+
+122
+00:06:03,039 --> 00:06:08,840
+really. I mean, it's responding good in
+
+123
+00:06:05,600 --> 00:06:08,840
+my end.
+
+124
+00:06:14,479 --> 00:06:17,960
+Come on now.
+
+125
+00:06:22,960 --> 00:06:27,000
+Just going to hit copy again.
+
+126
+00:06:31,840 --> 00:06:36,319
+And then I'm going to try to paste this.
+
+127
+00:06:34,080 --> 00:06:37,520
+There we go.
+
+128
+00:06:36,319 --> 00:06:41,280
+All right. So, you got a ranking
+
+129
+00:06:37,520 --> 00:06:42,639
+position ranking URL, right? So, few
+
+130
+00:06:41,280 --> 00:06:46,160
+different things going on here. Now, we
+
+131
+00:06:42,639 --> 00:06:49,160
+got to do our um
+
+132
+00:06:46,160 --> 00:06:49,160
+niche
+
+133
+00:06:49,840 --> 00:06:52,840
+location.
+
+134
+00:06:54,160 --> 00:06:59,880
+And then I think there's like a keyword
+
+135
+00:06:55,759 --> 00:06:59,880
+one as well, right? because it's
+
+136
+00:07:01,680 --> 00:07:05,240
+kind of like that.
+
+137
+00:07:05,919 --> 00:07:11,319
+And then I think we'll also have a
+
+138
+00:07:07,520 --> 00:07:11,319
+config at some level.
+
+139
+00:07:19,039 --> 00:07:22,280
+Come on.
+
+140
+00:07:22,639 --> 00:07:28,319
+So, several sheets here. You got your
+
+141
+00:07:25,039 --> 00:07:31,440
+rankings as your set already loaded in
+
+142
+00:07:28,319 --> 00:07:34,319
+like that.
+
+143
+00:07:31,440 --> 00:07:36,960
+So then you're going to go back here to
+
+144
+00:07:34,319 --> 00:07:39,520
+Tampa ranking and you're going to go to
+
+145
+00:07:36,960 --> 00:07:43,039
+locations
+
+146
+00:07:39,520 --> 00:07:45,120
+and you're going to grab uh your your
+
+147
+00:07:43,039 --> 00:07:48,120
+different areas, right? Like all this
+
+148
+00:07:45,120 --> 00:07:48,120
+information
+
+149
+00:07:48,880 --> 00:07:53,599
+here.
+
+150
+00:07:51,120 --> 00:07:55,840
+And you're going to come over to
+
+151
+00:07:53,599 --> 00:08:01,639
+location.
+
+152
+00:07:55,840 --> 00:08:01,639
+Paste that in. Oops. We need a column.
+
+153
+00:08:10,160 --> 00:08:13,160
+There.
+
+154
+00:08:13,680 --> 00:08:18,160
+Now, I'm unopinionated about the column
+
+155
+00:08:15,759 --> 00:08:21,919
+names themselves,
+
+156
+00:08:18,160 --> 00:08:23,919
+but we will make a You said income,
+
+157
+00:08:21,919 --> 00:08:25,120
+population, and then you did a manual
+
+158
+00:08:23,919 --> 00:08:27,440
+check.
+
+159
+00:08:25,120 --> 00:08:29,680
+Yeah, I just had to make sure that uh
+
+160
+00:08:27,440 --> 00:08:30,400
+what my automation is giving me is uh
+
+161
+00:08:29,680 --> 00:08:33,919
+accurate.
+
+162
+00:08:30,400 --> 00:08:35,200
+Okay. And is it like did you find uh
+
+163
+00:08:33,919 --> 00:08:36,880
+completely accurate or were there
+
+164
+00:08:35,200 --> 00:08:38,640
+discrepancies?
+
+165
+00:08:36,880 --> 00:08:40,320
+They're they're accurate. Yeah.
+
+166
+00:08:38,640 --> 00:08:41,519
+Okay, great. So, what I'm I'm actually
+
+167
+00:08:40,320 --> 00:08:43,039
+just going to delete these two columns
+
+168
+00:08:41,519 --> 00:08:44,399
+because I'm just assuming you're you're
+
+169
+00:08:43,039 --> 00:08:44,720
+correct in your numbers.
+
+170
+00:08:44,399 --> 00:08:46,320
+Yeah.
+
+171
+00:08:44,720 --> 00:08:48,560
+Um I don't want to I don't want to
+
+172
+00:08:46,320 --> 00:08:50,800
+pollute what we've got going on here.
+
+173
+00:08:48,560 --> 00:08:53,800
+Right. So, then we have to do a location
+
+174
+00:08:50,800 --> 00:08:53,800
+score.
+
+175
+00:08:54,399 --> 00:09:00,160
+And again, I could write this um
+
+176
+00:08:58,080 --> 00:09:02,000
+uh
+
+177
+00:09:00,160 --> 00:09:03,760
+write this function myself, but
+
+178
+00:09:02,000 --> 00:09:06,959
+basically what we're going to do is
+
+179
+00:09:03,760 --> 00:09:09,760
+calculate that score. is going to be a
+
+180
+00:09:06,959 --> 00:09:12,080
+um
+
+181
+00:09:09,760 --> 00:09:15,360
+a set of keywords. We come back here and
+
+182
+00:09:12,080 --> 00:09:18,320
+grab our keywords.
+
+183
+00:09:15,360 --> 00:09:20,480
+So, this should be
+
+184
+00:09:18,320 --> 00:09:23,440
+your
+
+185
+00:09:20,480 --> 00:09:26,440
+services and keywords essentially,
+
+186
+00:09:23,440 --> 00:09:26,440
+right?
+
+187
+00:09:40,000 --> 00:09:43,240
+like that.
+
+188
+00:09:53,680 --> 00:10:00,839
+And then you've got your operation to
+
+189
+00:09:56,240 --> 00:10:00,839
+generate those um
+
+190
+00:10:02,240 --> 00:10:06,880
+keyword plus geos which we've already
+
+191
+00:10:04,080 --> 00:10:08,800
+got like kind of in our
+
+192
+00:10:06,880 --> 00:10:10,720
+uh these are like the core keywords.
+
+193
+00:10:08,800 --> 00:10:12,480
+They are
+
+194
+00:10:10,720 --> 00:10:15,519
+formatted
+
+195
+00:10:12,480 --> 00:10:18,880
+in the sort of old way, right? Which is
+
+196
+00:10:15,519 --> 00:10:20,480
+that they're capitalized. Um I'd rather
+
+197
+00:10:18,880 --> 00:10:23,760
+them
+
+198
+00:10:20,480 --> 00:10:25,279
+basically remain formatted like this. Uh
+
+199
+00:10:23,760 --> 00:10:27,519
+I guess these must have come from the
+
+200
+00:10:25,279 --> 00:10:28,079
+surges or something.
+
+201
+00:10:27,519 --> 00:10:29,680
+Yeah.
+
+202
+00:10:28,079 --> 00:10:31,360
+During our process with that because we
+
+203
+00:10:29,680 --> 00:10:33,040
+were also I think part of the
+
+204
+00:10:31,360 --> 00:10:36,320
+capitalization was that we were
+
+205
+00:10:33,040 --> 00:10:40,760
+preparing like title names and stuff. Um
+
+206
+00:10:36,320 --> 00:10:40,760
+so we were avoiding that. What?
+
+207
+00:11:00,160 --> 00:11:03,640
+Sorry about that.
+
+208
+00:11:05,760 --> 00:11:12,240
+Uh so
+
+209
+00:11:09,360 --> 00:11:14,480
+I think we so so one of the things that
+
+210
+00:11:12,240 --> 00:11:17,600
+we have to keep in mind um and one of
+
+211
+00:11:14,480 --> 00:11:21,839
+the reasons I like
+
+212
+00:11:17,600 --> 00:11:23,440
+this here uh
+
+213
+00:11:21,839 --> 00:11:25,839
+interesting how these calculated it
+
+214
+00:11:23,440 --> 00:11:27,920
+right because this is a core keyword. So
+
+215
+00:11:25,839 --> 00:11:30,640
+basically one of the things we have to
+
+216
+00:11:27,920 --> 00:11:32,640
+do and we're very concerned with is when
+
+217
+00:11:30,640 --> 00:11:36,079
+you're looking at your rankings, you
+
+218
+00:11:32,640 --> 00:11:42,720
+want to know whether the keyword plus
+
+219
+00:11:36,079 --> 00:11:45,040
+geo is a pure keyword or if it's a um a
+
+220
+00:11:42,720 --> 00:11:48,640
+location modified one. Right? So in this
+
+221
+00:11:45,040 --> 00:11:51,200
+case you can see that this one is uh a
+
+222
+00:11:48,640 --> 00:11:52,959
+pure keyword and this one is location
+
+223
+00:11:51,200 --> 00:11:54,399
+modified. This one's location modified.
+
+224
+00:11:52,959 --> 00:11:56,000
+This one's a pure keyword. This one's
+
+225
+00:11:54,399 --> 00:11:58,160
+location modified. This one's location
+
+226
+00:11:56,000 --> 00:12:00,880
+modified, right? So, how do you
+
+227
+00:11:58,160 --> 00:12:03,279
+determine that
+
+228
+00:12:00,880 --> 00:12:04,640
+from a data perspective?
+
+229
+00:12:03,279 --> 00:12:07,920
+Um,
+
+230
+00:12:04,640 --> 00:12:11,120
+when you're analyzing this sheet,
+
+231
+00:12:07,920 --> 00:12:13,120
+well, it contains the uh like a location
+
+232
+00:12:11,120 --> 00:12:16,639
+like an area.
+
+233
+00:12:13,120 --> 00:12:19,600
+That's hard to to do. I would actually
+
+234
+00:12:16,639 --> 00:12:22,880
+just say, does this match keyword, do
+
+235
+00:12:19,600 --> 00:12:25,680
+these two match? They need to be uh
+
+236
+00:12:22,880 --> 00:12:27,440
+controlled for capitalization.
+
+237
+00:12:25,680 --> 00:12:29,120
+But you want like you'd be able to say
+
+238
+00:12:27,440 --> 00:12:31,600
+wildlife pest control, wildlife pest
+
+239
+00:12:29,120 --> 00:12:33,519
+control. That's a match. Wildlife pest
+
+240
+00:12:31,600 --> 00:12:35,920
+control, wildlife pest control
+
+241
+00:12:33,519 --> 00:12:37,760
+riverview, not a match, right? So they
+
+242
+00:12:35,920 --> 00:12:43,279
+have to be like an exact match when
+
+243
+00:12:37,760 --> 00:12:45,680
+controlled for um per uh capitalization,
+
+244
+00:12:43,279 --> 00:12:48,000
+right? So that's an easy way for you to
+
+245
+00:12:45,680 --> 00:12:49,120
+determine if you're working with a core
+
+246
+00:12:48,000 --> 00:12:52,720
+keyword or if you're working with a
+
+247
+00:12:49,120 --> 00:12:55,200
+location modified keyword because in our
+
+248
+00:12:52,720 --> 00:12:57,120
+mindset here and part of this decay
+
+249
+00:12:55,200 --> 00:13:01,200
+we're talking about that we're trying to
+
+250
+00:12:57,120 --> 00:13:04,160
+focus on is there is an inherent belief
+
+251
+00:13:01,200 --> 00:13:06,079
+at least on my end that the raw keyword
+
+252
+00:13:04,160 --> 00:13:08,240
+is worth more than location modified
+
+253
+00:13:06,079 --> 00:13:10,079
+keyword because of search volume
+
+254
+00:13:08,240 --> 00:13:12,240
+generally right people are more likely
+
+255
+00:13:10,079 --> 00:13:15,680
+to search raccoon removal than raccoon
+
+256
+00:13:12,240 --> 00:13:16,800
+removal Detroit uh because it's they're
+
+257
+00:13:15,680 --> 00:13:19,040
+assuming they're going to get some
+
+258
+00:13:16,800 --> 00:13:21,120
+location aspect to that response. Now,
+
+259
+00:13:19,040 --> 00:13:23,440
+they might then make that, you know,
+
+260
+00:13:21,120 --> 00:13:25,040
+search as well. Could be. I can't
+
+261
+00:13:23,440 --> 00:13:27,120
+necessarily say that the volume is going
+
+262
+00:13:25,040 --> 00:13:29,920
+to be one way or the other. This is why
+
+263
+00:13:27,120 --> 00:13:31,680
+we're going to create a
+
+264
+00:13:29,920 --> 00:13:34,399
+um
+
+265
+00:13:31,680 --> 00:13:39,040
+a sort of weighted method to be able to
+
+266
+00:13:34,399 --> 00:13:41,279
+discriminate. Uh so um the interesting
+
+267
+00:13:39,040 --> 00:13:43,680
+thing about algorithms
+
+268
+00:13:41,279 --> 00:13:45,519
+uh is that they are sort of these
+
+269
+00:13:43,680 --> 00:13:47,600
+opinionated guesses about data
+
+270
+00:13:45,519 --> 00:13:51,279
+relationships and why they matter.
+
+271
+00:13:47,600 --> 00:13:54,560
+Right? So our big opinion in this above
+
+272
+00:13:51,279 --> 00:13:56,399
+all things other than location specific
+
+273
+00:13:54,560 --> 00:13:58,560
+stuff which is more straightforward
+
+274
+00:13:56,399 --> 00:14:01,279
+because that's about population and and
+
+275
+00:13:58,560 --> 00:14:03,120
+monetary value within that market. um
+
+276
+00:14:01,279 --> 00:14:06,000
+which is a pretty safe opinion I think
+
+277
+00:14:03,120 --> 00:14:09,120
+because you can't make dollar bills come
+
+278
+00:14:06,000 --> 00:14:10,639
+out of the earth essentially. Uh the
+
+279
+00:14:09,120 --> 00:14:15,040
+other opinion we're going to take is
+
+280
+00:14:10,639 --> 00:14:19,839
+that the um base keyword in a market is
+
+281
+00:14:15,040 --> 00:14:22,720
+worth more than the uh location modified
+
+282
+00:14:19,839 --> 00:14:25,120
+ones. Partly because the base keyword is
+
+283
+00:14:22,720 --> 00:14:27,279
+a very singular and then the location
+
+284
+00:14:25,120 --> 00:14:29,760
+modified is very buried, right? because
+
+285
+00:14:27,279 --> 00:14:31,680
+there's multip multiplication happening
+
+286
+00:14:29,760 --> 00:14:34,000
+in in their creation. In this case, it's
+
+287
+00:14:31,680 --> 00:14:39,800
+only times two, but in other cases, it
+
+288
+00:14:34,000 --> 00:14:39,800
+might be um more uh
+
+289
+00:14:40,880 --> 00:14:47,279
+so um
+
+290
+00:14:44,560 --> 00:14:50,279
+what am I thinking here?
+
+291
+00:14:47,279 --> 00:14:50,279
+Uh
+
+292
+00:14:50,800 --> 00:14:57,120
+damn, my brain just turned off. Um,
+
+293
+00:14:55,040 --> 00:14:59,920
+it was one of the people asking for a
+
+294
+00:14:57,120 --> 00:15:02,399
+goose dog. The guy in Fort Worth was is
+
+295
+00:14:59,920 --> 00:15:04,320
+like saying, "You have any goose dogs?
+
+296
+00:15:02,399 --> 00:15:07,760
+Your mom?"
+
+297
+00:15:04,320 --> 00:15:11,920
+And she doesn't have any yet. So, um,
+
+298
+00:15:07,760 --> 00:15:13,519
+what was I going to say? Uh,
+
+299
+00:15:11,920 --> 00:15:15,360
+sorry, my daughter's also crying, so
+
+300
+00:15:13,519 --> 00:15:18,000
+that's not helping either.
+
+301
+00:15:15,360 --> 00:15:20,000
+Um,
+
+302
+00:15:18,000 --> 00:15:23,120
+where were we? Where did we leave off?
+
+303
+00:15:20,000 --> 00:15:25,920
+uh you were uh saying uh weighing of
+
+304
+00:15:23,120 --> 00:15:27,360
+pure keywords and uh
+
+305
+00:15:25,920 --> 00:15:29,120
+right so that's an opinion we're taking
+
+306
+00:15:27,360 --> 00:15:32,160
+too is that the the pure keywords are
+
+307
+00:15:29,120 --> 00:15:34,240
+work and should be considered as a chunk
+
+308
+00:15:32,160 --> 00:15:37,440
+that is separate from the location ones
+
+309
+00:15:34,240 --> 00:15:40,959
+because the location ones are um
+
+310
+00:15:37,440 --> 00:15:45,440
+probably is as I guess handled less
+
+311
+00:15:40,959 --> 00:15:47,680
+frequently um but also uh the assumption
+
+312
+00:15:45,440 --> 00:15:49,440
+is that they there's going to be more of
+
+313
+00:15:47,680 --> 00:15:53,839
+them than there are of the pure keywords
+
+314
+00:15:49,440 --> 00:15:55,519
+just because of um the the
+
+315
+00:15:53,839 --> 00:15:58,880
+multiplication aspect and how they're
+
+316
+00:15:55,519 --> 00:16:02,240
+generated. So if you're allowing the
+
+317
+00:15:58,880 --> 00:16:03,519
+number of keywords to happen, uh the the
+
+318
+00:16:02,240 --> 00:16:05,519
+pure keywords are always going to be
+
+319
+00:16:03,519 --> 00:16:07,600
+outweighed by the the keyword geos
+
+320
+00:16:05,519 --> 00:16:09,600
+because they multiply. And so if they're
+
+321
+00:16:07,600 --> 00:16:11,519
+if we're talking about shares of number
+
+322
+00:16:09,600 --> 00:16:14,560
+of keywords, then you're polluting your
+
+323
+00:16:11,519 --> 00:16:16,160
+data that way. Now, we're taking an
+
+324
+00:16:14,560 --> 00:16:17,680
+opinion that they're treated at least
+
+325
+00:16:16,160 --> 00:16:20,000
+differently. We're not saying that one
+
+326
+00:16:17,680 --> 00:16:23,519
+has to be worth more than the other uh
+
+327
+00:16:20,000 --> 00:16:26,320
+necessarily. Um we do in our logarithmic
+
+328
+00:16:23,519 --> 00:16:30,639
+decay place at the the front end of that
+
+329
+00:16:26,320 --> 00:16:33,040
+the the um the pure keywords or core
+
+330
+00:16:30,639 --> 00:16:35,120
+keywords assuming that they have more
+
+331
+00:16:33,040 --> 00:16:37,040
+value. If it we'd have to treat it
+
+332
+00:16:35,120 --> 00:16:38,800
+differently if we didn't know. But we
+
+333
+00:16:37,040 --> 00:16:41,759
+are allowing or we're going to create a
+
+334
+00:16:38,800 --> 00:16:45,360
+value that allows us to do a slider
+
+335
+00:16:41,759 --> 00:16:47,120
+right um for where that happens. like
+
+336
+00:16:45,360 --> 00:16:49,279
+where is this cut off point? So if you
+
+337
+00:16:47,120 --> 00:16:51,440
+got a logarithmic scale and you're
+
+338
+00:16:49,279 --> 00:16:53,519
+partitioning it into two pieces to say
+
+339
+00:16:51,440 --> 00:16:56,079
+that one piece is going to be keyword
+
+340
+00:16:53,519 --> 00:17:00,240
+plus geo and the other one's just pure
+
+341
+00:16:56,079 --> 00:17:02,240
+keyword. Drawing that partition point is
+
+342
+00:17:00,240 --> 00:17:04,720
+going to be a parameter that we feed
+
+343
+00:17:02,240 --> 00:17:07,360
+into the equation. Right? So we could
+
+344
+00:17:04,720 --> 00:17:11,360
+say the only the top 10% are pure
+
+345
+00:17:07,360 --> 00:17:13,760
+keywords and the rest are 90. uh or we
+
+346
+00:17:11,360 --> 00:17:17,839
+could say the core keywords are worth
+
+347
+00:17:13,760 --> 00:17:19,919
+80% and then the last 20% are um
+
+348
+00:17:17,839 --> 00:17:21,760
+geomodified keywords, right? So we get
+
+349
+00:17:19,919 --> 00:17:24,319
+the ability to really screw with the
+
+350
+00:17:21,760 --> 00:17:26,959
+output by changing one number which is
+
+351
+00:17:24,319 --> 00:17:29,840
+something called uh like abstraction,
+
+352
+00:17:26,959 --> 00:17:32,000
+right? It's creating an interface for a
+
+353
+00:17:29,840 --> 00:17:33,919
+user to make very minimal inputs to have
+
+354
+00:17:32,000 --> 00:17:37,440
+drastic I wouldn't say drastic changes
+
+355
+00:17:33,919 --> 00:17:38,640
+but um valuable changes, right? they
+
+356
+00:17:37,440 --> 00:17:40,160
+don't have to go into the code and
+
+357
+00:17:38,640 --> 00:17:41,679
+rewrite how the code functions because
+
+358
+00:17:40,160 --> 00:17:45,280
+they can just change one parameter and
+
+359
+00:17:41,679 --> 00:17:47,440
+get it to move significantly. So that is
+
+360
+00:17:45,280 --> 00:17:50,640
+one parameter we're going to feed from
+
+361
+00:17:47,440 --> 00:17:55,679
+our config is basically this like uh
+
+362
+00:17:50,640 --> 00:17:57,679
+partition point in the the that graph of
+
+363
+00:17:55,679 --> 00:18:01,679
+like on the x-axis like where do we put
+
+364
+00:17:57,679 --> 00:18:06,240
+that you know should the first
+
+365
+00:18:01,679 --> 00:18:08,799
+uh 50% be this or that and then um there
+
+366
+00:18:06,240 --> 00:18:10,720
+is another point there too that we'll
+
+367
+00:18:08,799 --> 00:18:12,640
+issue at the same time called the kappa
+
+368
+00:18:10,720 --> 00:18:15,280
+and the kappa determines the slope of
+
+369
+00:18:12,640 --> 00:18:17,919
+the curve. If the cap is at one then
+
+370
+00:18:15,280 --> 00:18:19,919
+then it's a straight line and if it's
+
+371
+00:18:17,919 --> 00:18:22,720
+higher than one then it starts to do
+
+372
+00:18:19,919 --> 00:18:25,840
+this curving motion right so we can we
+
+373
+00:18:22,720 --> 00:18:28,960
+can make it a flat treatment right
+
+374
+00:18:25,840 --> 00:18:31,840
+generally um or or have like a linear
+
+375
+00:18:28,960 --> 00:18:33,600
+descent uh by setting it at one I think
+
+376
+00:18:31,840 --> 00:18:35,520
+if we do it even less than that then it
+
+377
+00:18:33,600 --> 00:18:38,720
+even probably does this and maybe comes
+
+378
+00:18:35,520 --> 00:18:40,160
+to uh some kind of
+
+379
+00:18:38,720 --> 00:18:42,320
+point I'm not exactly sure what happens
+
+380
+00:18:40,160 --> 00:18:44,559
+when you go under one um but we will
+
+381
+00:18:42,320 --> 00:18:47,039
+have a kappa and we will have uh a
+
+382
+00:18:44,559 --> 00:18:50,240
+partition point basically uh along the
+
+383
+00:18:47,039 --> 00:18:53,120
+x-axis. Um and so those are the big
+
+384
+00:18:50,240 --> 00:18:54,960
+deals. Then inside those what we're
+
+385
+00:18:53,120 --> 00:18:56,960
+doing is saying all right we've got
+
+386
+00:18:54,960 --> 00:18:59,520
+we're looking at these by location right
+
+387
+00:18:56,960 --> 00:19:00,880
+so let's let's take a look at the top
+
+388
+00:18:59,520 --> 00:19:03,200
+calculation because I think it's
+
+389
+00:19:00,880 --> 00:19:06,480
+important to understand
+
+390
+00:19:03,200 --> 00:19:08,799
+uh things from the top well one concept
+
+391
+00:19:06,480 --> 00:19:10,559
+otherwise first I want to bring in here
+
+392
+00:19:08,799 --> 00:19:13,600
+um have have you ever heard of
+
+393
+00:19:10,559 --> 00:19:15,360
+normalization before
+
+394
+00:19:13,600 --> 00:19:16,640
+I've heard of the term I'm not really
+
+395
+00:19:15,360 --> 00:19:20,000
+sure what it's for
+
+396
+00:19:16,640 --> 00:19:21,919
+so normalization is basically taking a
+
+397
+00:19:20,000 --> 00:19:23,600
+range of numbers numbers that exist,
+
+398
+00:19:21,919 --> 00:19:24,799
+right? Because they they could apply to
+
+399
+00:19:23,600 --> 00:19:26,640
+any scenario, right? In some
+
+400
+00:19:24,799 --> 00:19:28,799
+measurements, you're going to have a
+
+401
+00:19:26,640 --> 00:19:31,200
+value starting at let's say it's
+
+402
+00:19:28,799 --> 00:19:33,840
+temperature, right? Like zero Kelvin up
+
+403
+00:19:31,200 --> 00:19:35,360
+to, you know, whatever Celsius, it's
+
+404
+00:19:33,840 --> 00:19:36,799
+different. It starts it goes all the way
+
+405
+00:19:35,360 --> 00:19:38,160
+into the negatives and and you know what
+
+406
+00:19:36,799 --> 00:19:40,640
+I mean? Like there's different ways of
+
+407
+00:19:38,160 --> 00:19:43,120
+of calculating like the same thing um
+
+408
+00:19:40,640 --> 00:19:44,720
+with a with a certain range. To
+
+409
+00:19:43,120 --> 00:19:47,280
+normalize means that you're creating a
+
+410
+00:19:44,720 --> 00:19:50,559
+standard scale for all things in the set
+
+411
+00:19:47,280 --> 00:19:53,360
+to exist between usually zero and one,
+
+412
+00:19:50,559 --> 00:19:55,840
+but also sometimes negative one and one.
+
+413
+00:19:53,360 --> 00:19:59,440
+So you're you're probably like, okay,
+
+414
+00:19:55,840 --> 00:20:01,440
+well, how does that help? Um it helps in
+
+415
+00:19:59,440 --> 00:20:04,480
+factoring things like mult by
+
+416
+00:20:01,440 --> 00:20:06,000
+multiplying numbers together because it
+
+417
+00:20:04,480 --> 00:20:09,440
+allows you to kind of get everything in
+
+418
+00:20:06,000 --> 00:20:11,360
+the same uh sort of wheelhouse so that
+
+419
+00:20:09,440 --> 00:20:14,000
+the the calculations are standard and
+
+420
+00:20:11,360 --> 00:20:16,000
+consistent. An easy way to think of this
+
+421
+00:20:14,000 --> 00:20:19,120
+is that we could create a normalized
+
+422
+00:20:16,000 --> 00:20:21,679
+value for a date and we would do that by
+
+423
+00:20:19,120 --> 00:20:26,400
+you know you've got 365 days in the
+
+424
+00:20:21,679 --> 00:20:28,720
+year. October 30th is um let's just
+
+425
+00:20:26,400 --> 00:20:32,600
+Google it, right? How many days into the
+
+426
+00:20:28,720 --> 00:20:32,600
+year is October 30th?
+
+427
+00:20:35,919 --> 00:20:42,480
+We'll say 30.
+
+428
+00:20:39,200 --> 00:20:44,799
+I don't trust the AI answer.
+
+429
+00:20:42,480 --> 00:20:47,679
+That's going to be [ __ ]
+
+430
+00:20:44,799 --> 00:20:50,960
+Day of the year calculator
+
+431
+00:20:47,679 --> 00:20:52,240
+303 days into the year, right? So what
+
+432
+00:20:50,960 --> 00:20:54,559
+that means is that if you're going to
+
+433
+00:20:52,240 --> 00:20:58,320
+calculate a normalized score, you would
+
+434
+00:20:54,559 --> 00:21:00,400
+do 303 divided by 365.
+
+435
+00:20:58,320 --> 00:21:05,039
+And if we were to just kind of do that
+
+436
+00:21:00,400 --> 00:21:08,480
+over here in the config and we said 303
+
+437
+00:21:05,039 --> 00:21:09,840
+/ 365.
+
+438
+00:21:08,480 --> 00:21:12,840
+Oh, it doesn't want to do the
+
+439
+00:21:09,840 --> 00:21:12,840
+calculation.
+
+440
+00:21:13,280 --> 00:21:19,799
+How do you
+
+441
+00:21:15,679 --> 00:21:19,799
+Why are you treating it like a string?
+
+442
+00:21:20,480 --> 00:21:25,679
+That's odd.
+
+443
+00:21:23,120 --> 00:21:30,720
+We'll just do 303
+
+444
+00:21:25,679 --> 00:21:33,679
+365. Oh, I think I know why. Equals this
+
+445
+00:21:30,720 --> 00:21:38,880
+divided by that. And that's a normalized
+
+446
+00:21:33,679 --> 00:21:41,520
+score. You are 83 01369863
+
+447
+00:21:38,880 --> 00:21:43,919
+through the year. Right? So, you can see
+
+448
+00:21:41,520 --> 00:21:46,320
+how once you get to 365, you're getting
+
+449
+00:21:43,919 --> 00:21:48,640
+to a score of one. And on January 1st,
+
+450
+00:21:46,320 --> 00:21:51,120
+you're at a score of zero. Right. So
+
+451
+00:21:48,640 --> 00:21:53,280
+that's like a a quick illustration of
+
+452
+00:21:51,120 --> 00:21:54,559
+like how you get those numbers is not
+
+453
+00:21:53,280 --> 00:21:55,919
+that complicated. You're usually just
+
+454
+00:21:54,559 --> 00:21:58,559
+saying like well what is it as part of
+
+455
+00:21:55,919 --> 00:22:01,760
+the whole if we were to divide the
+
+456
+00:21:58,559 --> 00:22:03,200
+highest possible value um or divide the
+
+457
+00:22:01,760 --> 00:22:05,919
+number we're looking at by the highest
+
+458
+00:22:03,200 --> 00:22:09,679
+possible value what do we get? Right?
+
+459
+00:22:05,919 --> 00:22:12,400
+So we need a normalization range for
+
+460
+00:22:09,679 --> 00:22:14,320
+what we're talking about here. Uh the
+
+461
+00:22:12,400 --> 00:22:16,880
+way that this is logically going to flow
+
+462
+00:22:14,320 --> 00:22:19,760
+from the top is all about location,
+
+463
+00:22:16,880 --> 00:22:22,000
+right? because uh it doesn't matter what
+
+464
+00:22:19,760 --> 00:22:24,080
+a raccoon removal job versus a rat
+
+465
+00:22:22,000 --> 00:22:27,280
+removal job is worth if there are no
+
+466
+00:22:24,080 --> 00:22:30,799
+people with no money, right? And that's
+
+467
+00:22:27,280 --> 00:22:33,600
+what location factors, right? So, um
+
+468
+00:22:30,799 --> 00:22:36,640
+what we're going to do is we're going to
+
+469
+00:22:33,600 --> 00:22:40,320
+think about a very specific calculation
+
+470
+00:22:36,640 --> 00:22:42,159
+um which is going to be this uh the one
+
+471
+00:22:40,320 --> 00:22:44,480
+that you you were doing before, which is
+
+472
+00:22:42,159 --> 00:22:46,480
+the the income times the population.
+
+473
+00:22:44,480 --> 00:22:50,080
+We're gonna make a small adjustment to
+
+474
+00:22:46,480 --> 00:22:52,559
+the income by subtracting like $32,000
+
+475
+00:22:50,080 --> 00:22:56,320
+basically from it, which is the poverty
+
+476
+00:22:52,559 --> 00:22:57,919
+like line, right? So, what you'll do on
+
+477
+00:22:56,320 --> 00:23:03,039
+that first one for Houston is you'll
+
+478
+00:22:57,919 --> 00:23:04,720
+take the income minus the the uh the
+
+479
+00:23:03,039 --> 00:23:06,480
+poverty level to get discretionary
+
+480
+00:23:04,720 --> 00:23:11,440
+income. And then we're going to multiply
+
+481
+00:23:06,480 --> 00:23:12,640
+that by the uh um population. And that's
+
+482
+00:23:11,440 --> 00:23:15,360
+going to give us a number. And we're
+
+483
+00:23:12,640 --> 00:23:16,799
+going to do that for every single row.
+
+484
+00:23:15,360 --> 00:23:19,520
+And then we're going to take all of
+
+485
+00:23:16,799 --> 00:23:22,559
+those together and add them up. And
+
+486
+00:23:19,520 --> 00:23:25,760
+that's going to be our value of one. So
+
+487
+00:23:22,559 --> 00:23:28,240
+then we can get our our partial score uh
+
+488
+00:23:25,760 --> 00:23:30,000
+against all of these guys by dividing
+
+489
+00:23:28,240 --> 00:23:32,880
+their individual score by the total
+
+490
+00:23:30,000 --> 00:23:35,280
+number and that'll give us that like 0,
+
+491
+00:23:32,880 --> 00:23:38,559
+you know, 1 2 4 56 or whatever, right?
+
+492
+00:23:35,280 --> 00:23:41,039
+And that'll be our location score. So I
+
+493
+00:23:38,559 --> 00:23:42,559
+can show you a quick equation for that.
+
+494
+00:23:41,039 --> 00:23:44,240
+uh and we can run it on the sheet but
+
+495
+00:23:42,559 --> 00:23:45,600
+you will be writing it and running it in
+
+496
+00:23:44,240 --> 00:23:47,600
+code because it is something that should
+
+497
+00:23:45,600 --> 00:23:49,679
+happen when you click the button right
+
+498
+00:23:47,600 --> 00:23:52,000
+you don't want to you want to derive it
+
+499
+00:23:49,679 --> 00:23:53,919
+from the raw data you don't want to be
+
+500
+00:23:52,000 --> 00:23:57,120
+pulling the values from the sheet if you
+
+501
+00:23:53,919 --> 00:23:59,679
+recall correctly um but I can I can
+
+502
+00:23:57,120 --> 00:24:03,120
+quickly illustrate what that looks like
+
+503
+00:23:59,679 --> 00:24:05,200
+so uh we'll call this the score this is
+
+504
+00:24:03,120 --> 00:24:06,720
+actually hard to calculate without two
+
+505
+00:24:05,200 --> 00:24:08,320
+columns and this is another reason why
+
+506
+00:24:06,720 --> 00:24:11,679
+you're using the script so we're going
+
+507
+00:24:08,320 --> 00:24:14,000
+to call this the um we'll call this the
+
+508
+00:24:11,679 --> 00:24:16,799
+phase one score
+
+509
+00:24:14,000 --> 00:24:21,640
+or I would say numerical score and we'll
+
+510
+00:24:16,799 --> 00:24:21,640
+call this the normalized score.
+
+511
+00:24:22,799 --> 00:24:28,559
+Okay. So then we're going to say um
+
+512
+00:24:26,799 --> 00:24:30,320
+equals
+
+513
+00:24:28,559 --> 00:24:32,080
+this
+
+514
+00:24:30,320 --> 00:24:35,080
+minus
+
+515
+00:24:32,080 --> 00:24:35,080
+32,000.
+
+516
+00:24:35,200 --> 00:24:39,960
+Generally, we're going to put it in
+
+517
+00:24:36,960 --> 00:24:39,960
+parenthesis
+
+518
+00:24:40,320 --> 00:24:45,400
+and then we're going to multiply it by
+
+519
+00:24:42,159 --> 00:24:45,400
+the population,
+
+520
+00:24:47,039 --> 00:24:51,159
+right? That's not a small number.
+
+521
+00:24:52,240 --> 00:24:55,039
+And then you can see how hard it would
+
+522
+00:24:53,840 --> 00:24:57,679
+be to deal with this because it's
+
+523
+00:24:55,039 --> 00:25:02,679
+insane, right?
+
+524
+00:24:57,679 --> 00:25:02,679
+Um, so then you'd pull this down
+
+525
+00:25:02,799 --> 00:25:07,559
+and then you would say, uh,
+
+526
+00:25:07,840 --> 00:25:11,919
+we could calculate the the just a quick
+
+527
+00:25:10,320 --> 00:25:14,880
+little note here. So we don't have to do
+
+528
+00:25:11,919 --> 00:25:17,360
+a bunch of calcs. We could just say, um,
+
+529
+00:25:14,880 --> 00:25:19,840
+total
+
+530
+00:25:17,360 --> 00:25:24,559
+numerical
+
+531
+00:25:19,840 --> 00:25:28,159
+and that's going to equal the sum
+
+532
+00:25:24,559 --> 00:25:28,159
+of this through this.
+
+533
+00:25:30,320 --> 00:25:37,600
+Right. And then you're going to say this
+
+534
+00:25:32,799 --> 00:25:39,360
+equals this divided by this. But we're
+
+535
+00:25:37,600 --> 00:25:42,080
+going to take this and turn we're going
+
+536
+00:25:39,360 --> 00:25:44,080
+to use these uh Whoops. We're going to
+
+537
+00:25:42,080 --> 00:25:46,159
+put the dollar signs on the I2 so it
+
+538
+00:25:44,080 --> 00:25:50,600
+never changes position as we drag it
+
+539
+00:25:46,159 --> 00:25:50,600
+down. And now you see
+
+540
+00:25:50,640 --> 00:25:54,720
+very interestingly
+
+541
+00:25:53,360 --> 00:25:56,880
+these are the numbers you were looking
+
+542
+00:25:54,720 --> 00:26:00,919
+at before.
+
+543
+00:25:56,880 --> 00:26:00,919
+Riverview is 0.08.
+
+544
+00:26:08,559 --> 00:26:12,520
+Rather interesting, right?
+
+545
+00:26:15,279 --> 00:26:20,360
+And then these should all sum up to one.
+
+546
+00:26:22,480 --> 00:26:26,640
+Yeah. See how they all add up to one?
+
+547
+00:26:25,679 --> 00:26:28,640
+Right.
+
+548
+00:26:26,640 --> 00:26:30,320
+Cool, isn't it?
+
+549
+00:26:28,640 --> 00:26:34,000
+Yeah.
+
+550
+00:26:30,320 --> 00:26:38,000
+So then this normalized score is how we
+
+551
+00:26:34,000 --> 00:26:41,039
+associate what matters most for um for
+
+552
+00:26:38,000 --> 00:26:43,200
+everything. Now there's an assumption
+
+553
+00:26:41,039 --> 00:26:46,480
+baked in here that these populations
+
+554
+00:26:43,200 --> 00:26:48,159
+never intersect with other populations.
+
+555
+00:26:46,480 --> 00:26:49,679
+We don't really have a good way of
+
+556
+00:26:48,159 --> 00:26:51,840
+controlling for that. You know what I
+
+557
+00:26:49,679 --> 00:26:55,279
+mean? You wouldn't you wouldn't really
+
+558
+00:26:51,840 --> 00:26:58,480
+unless you did like a county level
+
+559
+00:26:55,279 --> 00:27:00,400
+like analysis as opposed to cities.
+
+560
+00:26:58,480 --> 00:27:02,960
+However, we're just going to do our best
+
+561
+00:27:00,400 --> 00:27:05,919
+here. So, it it we're assuming that
+
+562
+00:27:02,960 --> 00:27:07,919
+there's some level of duplication of
+
+563
+00:27:05,919 --> 00:27:09,760
+counts going on on like Newport Richie
+
+564
+00:27:07,919 --> 00:27:12,159
+and Newport Richie East might be not be
+
+565
+00:27:09,760 --> 00:27:14,320
+the same piece or they may be they may
+
+566
+00:27:12,159 --> 00:27:17,120
+overlap and so therefore some people are
+
+567
+00:27:14,320 --> 00:27:18,960
+counted twice. What are you going to do?
+
+568
+00:27:17,120 --> 00:27:21,679
+Uh we're just looking for general
+
+569
+00:27:18,960 --> 00:27:25,679
+relative accuracy and not like atomic
+
+570
+00:27:21,679 --> 00:27:27,840
+accuracy. So it's less of a big deal. Um
+
+571
+00:27:25,679 --> 00:27:31,760
+so then
+
+572
+00:27:27,840 --> 00:27:34,640
+the what you can see off of these is
+
+573
+00:27:31,760 --> 00:27:37,840
+that they do filter down in terms of
+
+574
+00:27:34,640 --> 00:27:41,039
+importance. Something like Separ is
+
+575
+00:27:37,840 --> 00:27:43,279
+worth far less to us to rank well in
+
+576
+00:27:41,039 --> 00:27:45,840
+than something like St. Petersburg which
+
+577
+00:27:43,279 --> 00:27:49,120
+is actually getting a 0.1. I don't see
+
+578
+00:27:45,840 --> 00:27:52,080
+any other 0.1s here. Almost everything
+
+579
+00:27:49,120 --> 00:27:53,279
+else has got a zero.
+
+580
+00:27:52,080 --> 00:27:54,159
+You know what I mean,
+
+581
+00:27:53,279 --> 00:27:58,120
+right?
+
+582
+00:27:54,159 --> 00:27:58,120
+Is Tampa on the list?
+
+583
+00:27:58,240 --> 00:28:04,080
+I don't see Tampa on the list.
+
+584
+00:28:02,000 --> 00:28:05,039
+Those are just I think the uh
+
+585
+00:28:04,080 --> 00:28:06,720
+neighborhood.
+
+586
+00:28:05,039 --> 00:28:09,840
+Make sure the core location is also
+
+587
+00:28:06,720 --> 00:28:13,039
+included in your calculations in in your
+
+588
+00:28:09,840 --> 00:28:14,960
+searches, right? Um because that's going
+
+589
+00:28:13,039 --> 00:28:16,960
+to be a big population zone and we'll
+
+590
+00:28:14,960 --> 00:28:19,440
+throw your numbers off. But St.
+
+591
+00:28:16,960 --> 00:28:22,960
+Petersburg clearly has a big population
+
+592
+00:28:19,440 --> 00:28:25,520
+and a decent income. It's not too bad.
+
+593
+00:28:22,960 --> 00:28:27,600
+Uh so there's definitely some money to
+
+594
+00:28:25,520 --> 00:28:30,240
+go around and this is a good one to
+
+595
+00:28:27,600 --> 00:28:32,480
+target. Right. We we're already getting
+
+596
+00:28:30,240 --> 00:28:35,039
+insights
+
+597
+00:28:32,480 --> 00:28:37,840
+on that stuff. Um some of these other
+
+598
+00:28:35,039 --> 00:28:40,960
+ones aren't so bad either. A point4 not
+
+599
+00:28:37,840 --> 00:28:45,440
+so bad. Decent income kind of high
+
+600
+00:28:40,960 --> 00:28:48,240
+population, right? So there's potential.
+
+601
+00:28:45,440 --> 00:28:49,760
+Um, now
+
+602
+00:28:48,240 --> 00:28:51,600
+we got a total numerical. We got the
+
+603
+00:28:49,760 --> 00:28:54,080
+normalized score. So now the way to
+
+604
+00:28:51,600 --> 00:28:58,760
+think about this is we'll go over to a
+
+605
+00:28:54,080 --> 00:28:58,760
+mind node or mind map here.
+
+606
+00:28:59,360 --> 00:29:03,720
+It opening up. What's going on?
+
+607
+00:29:04,960 --> 00:29:09,600
+Let's create a new one.
+
+608
+00:29:07,279 --> 00:29:13,559
+So, you're going to talk about um sort
+
+609
+00:29:09,600 --> 00:29:13,559
+of total potential score,
+
+610
+00:29:16,480 --> 00:29:20,960
+which is going to equal one. And then
+
+611
+00:29:19,039 --> 00:29:22,640
+let's let's look at three locations,
+
+612
+00:29:20,960 --> 00:29:28,760
+right?
+
+613
+00:29:22,640 --> 00:29:28,760
+So, we're going to say Riverview is 0088
+
+614
+00:29:31,039 --> 00:29:34,679
+0.088 088.
+
+615
+00:29:38,960 --> 00:29:44,880
+No, not what I wanted to do.
+
+616
+00:29:42,720 --> 00:29:46,799
+We'll just use a couple as an example.
+
+617
+00:29:44,880 --> 00:29:48,960
+Trinity
+
+618
+00:29:46,799 --> 00:29:51,960
+0
+
+619
+00:29:48,960 --> 00:29:51,960
+20.
+
+620
+00:29:57,760 --> 00:30:01,240
+Let's get rid of
+
+621
+00:30:03,120 --> 00:30:08,159
+And then we'll do one more, right? Which
+
+622
+00:30:05,919 --> 00:30:12,600
+will be
+
+623
+00:30:08,159 --> 00:30:12,600
+something really bad. Odessa.
+
+624
+00:30:24,080 --> 00:30:28,240
+So you can see immediately that Odessa
+
+625
+00:30:26,240 --> 00:30:30,960
+is like worth 10% of what Riverviews
+
+626
+00:30:28,240 --> 00:30:35,480
+were, right?
+
+627
+00:30:30,960 --> 00:30:35,480
+which is kind of crazy. It's actually 11
+
+628
+00:30:35,760 --> 00:30:40,399
+less than 10%.
+
+629
+00:30:38,320 --> 00:30:42,000
+Um,
+
+630
+00:30:40,399 --> 00:30:43,760
+so you know that that kind of gives you
+
+631
+00:30:42,000 --> 00:30:46,399
+a lot of insight on what to target. Like
+
+632
+00:30:43,760 --> 00:30:51,600
+any effort you put into Odessa is worth
+
+633
+00:30:46,399 --> 00:30:54,159
+a tenth of what it is into Riverview. So
+
+634
+00:30:51,600 --> 00:30:55,679
+that's a good calculation for us and why
+
+635
+00:30:54,159 --> 00:30:58,000
+we're calculating this score at this
+
+636
+00:30:55,679 --> 00:31:00,960
+stage because it matters to us. And then
+
+637
+00:30:58,000 --> 00:31:05,200
+we're going to dovtail into sort of like
+
+638
+00:31:00,960 --> 00:31:07,679
+the uh services calculation, right? So
+
+639
+00:31:05,200 --> 00:31:11,200
+the services themselves are worth
+
+640
+00:31:07,679 --> 00:31:14,159
+different things. Um this is calculated
+
+641
+00:31:11,200 --> 00:31:17,840
+and if you if you recognize
+
+642
+00:31:14,159 --> 00:31:21,840
+this sort of set of columns is exactly
+
+643
+00:31:17,840 --> 00:31:25,120
+what we did in the uh in the Google ads
+
+644
+00:31:21,840 --> 00:31:26,559
+keyword planner. We we just took took a
+
+645
+00:31:25,120 --> 00:31:28,159
+couple figures. We like found the mean
+
+646
+00:31:26,559 --> 00:31:29,760
+and we multiplied it by the population.
+
+647
+00:31:28,159 --> 00:31:31,760
+Same thing, right? Like what is the the
+
+648
+00:31:29,760 --> 00:31:33,919
+cost per click of this keyword for this?
+
+649
+00:31:31,760 --> 00:31:35,360
+And then we had an analysis chart where
+
+650
+00:31:33,919 --> 00:31:36,880
+we were like, let's check bat. What is
+
+651
+00:31:35,360 --> 00:31:38,159
+bat worth as a share of the market? What
+
+652
+00:31:36,880 --> 00:31:39,440
+is this worth as a share of the market?
+
+653
+00:31:38,159 --> 00:31:45,360
+What is that worth as a share of the
+
+654
+00:31:39,440 --> 00:31:47,679
+market? Um and uh basically created a um
+
+655
+00:31:45,360 --> 00:31:51,440
+a calculus for you know like what to
+
+656
+00:31:47,679 --> 00:31:52,960
+focus on right uh in terms of like
+
+657
+00:31:51,440 --> 00:31:55,120
+keywords and the share of market and
+
+658
+00:31:52,960 --> 00:31:56,960
+stuff. um and also help us rank order in
+
+659
+00:31:55,120 --> 00:32:01,279
+our keywords. So what you would want to
+
+660
+00:31:56,960 --> 00:32:02,720
+do then is per service find that number
+
+661
+00:32:01,279 --> 00:32:04,000
+where you would go into the keyword
+
+662
+00:32:02,720 --> 00:32:04,880
+planner and that market. You'd say,
+
+663
+00:32:04,000 --> 00:32:07,360
+"Okay, we're going to get all the
+
+664
+00:32:04,880 --> 00:32:09,440
+raccoon ones and and then you'll you'll
+
+665
+00:32:07,360 --> 00:32:12,240
+try to find every raccoon keyword and
+
+666
+00:32:09,440 --> 00:32:15,440
+then add up that that value of the share
+
+667
+00:32:12,240 --> 00:32:18,799
+of market, right?" Um so that'll tell
+
+668
+00:32:15,440 --> 00:32:20,320
+you, you know, it might be 111 or 14 or
+
+669
+00:32:18,799 --> 00:32:26,159
+something like that. And then you would
+
+670
+00:32:20,320 --> 00:32:28,399
+take that and put that into a um
+
+671
+00:32:26,159 --> 00:32:31,120
+what is it? We'll call it the niche.
+
+672
+00:32:28,399 --> 00:32:33,279
+You're going to have the niche.
+
+673
+00:32:31,120 --> 00:32:35,120
+You're going to have the service and
+
+674
+00:32:33,279 --> 00:32:38,519
+then you're going to have the uh keyword
+
+675
+00:32:35,120 --> 00:32:38,519
+planner score
+
+676
+00:32:41,039 --> 00:32:44,039
+keyword.
+
+677
+00:32:47,519 --> 00:32:51,039
+And then you would do a numerical or you
+
+678
+00:32:50,000 --> 00:32:54,640
+would you would basically do a
+
+679
+00:32:51,039 --> 00:32:56,240
+normalization of that. Right? So you
+
+680
+00:32:54,640 --> 00:32:59,679
+might not be tracking all of the
+
+681
+00:32:56,240 --> 00:33:01,600
+services that you have in that set. So
+
+682
+00:32:59,679 --> 00:33:03,440
+let's say we're not focusing on RAT
+
+683
+00:33:01,600 --> 00:33:07,840
+right now, which is going to be a pretty
+
+684
+00:33:03,440 --> 00:33:09,519
+big part of any uh any calculation from
+
+685
+00:33:07,840 --> 00:33:11,600
+the keyword planner. If you're including
+
+686
+00:33:09,519 --> 00:33:14,640
+RAT in keyword planner, it's going to
+
+687
+00:33:11,600 --> 00:33:18,399
+make everything else look anemic, right?
+
+688
+00:33:14,640 --> 00:33:20,480
+So, um, you have to go for,
+
+689
+00:33:18,399 --> 00:33:22,799
+uh,
+
+690
+00:33:20,480 --> 00:33:25,679
+let's see, trying to think, my brain is
+
+691
+00:33:22,799 --> 00:33:27,440
+turning off again. Um, basically, you
+
+692
+00:33:25,679 --> 00:33:29,120
+want to pull their their normalized
+
+693
+00:33:27,440 --> 00:33:30,720
+scores from that, put them in this, and
+
+694
+00:33:29,120 --> 00:33:32,399
+then renormalize them against their own
+
+695
+00:33:30,720 --> 00:33:34,080
+axis so that you're not including RAT if
+
+696
+00:33:32,399 --> 00:33:35,840
+you don't want to factor RAT because
+
+697
+00:33:34,080 --> 00:33:38,320
+otherwise it'll skew your calculations
+
+698
+00:33:35,840 --> 00:33:40,159
+quite a bit. Um, you can add RAT in
+
+699
+00:33:38,320 --> 00:33:41,760
+later, and then that'll sort of tip over
+
+700
+00:33:40,159 --> 00:33:44,880
+the milk cart because it really does
+
+701
+00:33:41,760 --> 00:33:46,880
+change things. But having created the
+
+702
+00:33:44,880 --> 00:33:48,640
+right format, all you have to do is add
+
+703
+00:33:46,880 --> 00:33:50,240
+rat and change it and it won't change
+
+704
+00:33:48,640 --> 00:33:55,679
+like everything else if you know what I
+
+705
+00:33:50,240 --> 00:33:58,799
+mean. Um, so uh that's that. And then
+
+706
+00:33:55,679 --> 00:34:01,039
+the other implicit score here uh I I'll
+
+707
+00:33:58,799 --> 00:34:02,799
+let you fill these in um and then make
+
+708
+00:34:01,039 --> 00:34:07,519
+the normalization.
+
+709
+00:34:02,799 --> 00:34:10,159
+Do you if if I were to say, you know,
+
+710
+00:34:07,519 --> 00:34:12,159
+raccoon,
+
+711
+00:34:10,159 --> 00:34:14,399
+squirrel,
+
+712
+00:34:12,159 --> 00:34:16,320
+bat,
+
+713
+00:34:14,399 --> 00:34:19,639
+etc. And I were to have, you know, score
+
+714
+00:34:16,320 --> 00:34:19,639
+of 0.15
+
+715
+00:34:19,679 --> 00:34:23,240
+uh 0.08.
+
+716
+00:34:25,280 --> 00:34:32,200
+These are obviously not very high. And
+
+717
+00:34:28,159 --> 00:34:32,200
+then we'll say this one's 0.12.
+
+718
+00:34:33,440 --> 00:34:42,679
+You would basically sum those the same
+
+719
+00:34:36,480 --> 00:34:42,679
+way like we did on the other set. What
+
+720
+00:34:45,760 --> 00:34:51,960
+are you kidding me?
+
+721
+00:34:48,960 --> 00:34:51,960
+4.
+
+722
+00:34:52,960 --> 00:35:00,599
+And then you would you would divide this
+
+723
+00:34:57,200 --> 00:35:00,599
+by this.
+
+724
+00:35:02,480 --> 00:35:07,720
+And then you see how we get the
+
+725
+00:35:03,760 --> 00:35:07,720
+normalized scores again.
+
+726
+00:35:08,880 --> 00:35:13,040
+So they sort of get resuscitated from
+
+727
+00:35:11,119 --> 00:35:15,520
+from being low scores in the other
+
+728
+00:35:13,040 --> 00:35:17,440
+context, if that makes sense. And then
+
+729
+00:35:15,520 --> 00:35:20,320
+these are the scores we're working with.
+
+730
+00:35:17,440 --> 00:35:24,480
+So, what you would notice is that your
+
+731
+00:35:20,320 --> 00:35:28,320
+services are um
+
+732
+00:35:24,480 --> 00:35:31,320
+you know, you got your bat, raccoon,
+
+733
+00:35:28,320 --> 00:35:31,320
+squirrel.
+
+734
+00:35:34,800 --> 00:35:39,280
+You know, again, just as an example,
+
+735
+00:35:36,720 --> 00:35:43,480
+you'd be taking these numbers and
+
+736
+00:35:39,280 --> 00:35:43,480
+factoring them here.
+
+737
+00:35:51,599 --> 00:35:58,560
+So, this gives you your location
+
+738
+00:35:55,839 --> 00:36:00,560
+and then generally your niche, right? Uh
+
+739
+00:35:58,560 --> 00:36:04,480
+because all we're doing with the
+
+740
+00:36:00,560 --> 00:36:06,880
+keywords is rank ordering them. Um they
+
+741
+00:36:04,480 --> 00:36:10,320
+in my mind they don't matter so much. It
+
+742
+00:36:06,880 --> 00:36:11,599
+kind of comes down more to the uh
+
+743
+00:36:10,320 --> 00:36:14,560
+there's a few different ways to handle
+
+744
+00:36:11,599 --> 00:36:17,119
+it, right? You could
+
+745
+00:36:14,560 --> 00:36:19,280
+you could do a decay function on the
+
+746
+00:36:17,119 --> 00:36:21,839
+actual keyword list order for the core
+
+747
+00:36:19,280 --> 00:36:23,920
+keywords if you wanted. I decided to
+
+748
+00:36:21,839 --> 00:36:26,400
+just take an average so that you get the
+
+749
+00:36:23,920 --> 00:36:28,400
+chunk and then you just say we got five
+
+750
+00:36:26,400 --> 00:36:30,640
+keywords, they're all worth oneif of
+
+751
+00:36:28,400 --> 00:36:34,560
+whatever that first partition is worth.
+
+752
+00:36:30,640 --> 00:36:36,720
+Um because I I just don't see a huge
+
+753
+00:36:34,560 --> 00:36:38,960
+difference in raccoon removal and
+
+754
+00:36:36,720 --> 00:36:41,119
+raccoon control necessarily. You know
+
+755
+00:36:38,960 --> 00:36:44,560
+what I mean? Um, maybe there is, maybe
+
+756
+00:36:41,119 --> 00:36:46,960
+there isn't. Hard to tell. Uh, I think
+
+757
+00:36:44,560 --> 00:36:48,640
+that if you really wanted to to get
+
+758
+00:36:46,960 --> 00:36:51,119
+super analytical about it, you'd dive
+
+759
+00:36:48,640 --> 00:36:52,960
+deeper into that keyword planner data,
+
+760
+00:36:51,119 --> 00:36:56,480
+but I want something that's robust
+
+761
+00:36:52,960 --> 00:36:58,079
+enough to work for uh a small market,
+
+762
+00:36:56,480 --> 00:37:00,160
+right? So, I don't want to be too
+
+763
+00:36:58,079 --> 00:37:02,640
+opinionated about the actual search term
+
+764
+00:37:00,160 --> 00:37:04,960
+because you might be missing search
+
+765
+00:37:02,640 --> 00:37:07,520
+terms because the keyword data from the
+
+766
+00:37:04,960 --> 00:37:10,400
+keyword planner too sparse to properly
+
+767
+00:37:07,520 --> 00:37:15,440
+plan for mobile. You know what I mean?
+
+768
+00:37:10,400 --> 00:37:21,119
+Um, so uh
+
+769
+00:37:15,440 --> 00:37:23,440
+yeah, that's generally the idea. Um
+
+770
+00:37:21,119 --> 00:37:25,200
+so you can see that
+
+771
+00:37:23,440 --> 00:37:28,079
+this is like a filter like a power
+
+772
+00:37:25,200 --> 00:37:30,320
+filter out of one possible total
+
+773
+00:37:28,079 --> 00:37:33,839
+riverview is worth this and then it gets
+
+774
+00:37:30,320 --> 00:37:36,000
+split up that 088 gets split up like
+
+775
+00:37:33,839 --> 00:37:43,119
+this accordingly based on the niche
+
+776
+00:37:36,000 --> 00:37:45,760
+right so then based off of whatever um
+
+777
+00:37:43,119 --> 00:37:50,640
+this is times this right because you
+
+778
+00:37:45,760 --> 00:37:53,440
+multiply these Uh so if we were to say
+
+779
+00:37:50,640 --> 00:37:57,440
+just again on this rank score thing, if
+
+780
+00:37:53,440 --> 00:38:00,440
+we were to say raccoon uh service in
+
+781
+00:37:57,440 --> 00:38:00,440
+Riverview,
+
+782
+00:38:02,560 --> 00:38:09,599
+we would calculate a score and the score
+
+783
+00:38:05,839 --> 00:38:11,440
+would be this number times this number.
+
+784
+00:38:09,599 --> 00:38:13,520
+So 0.088
+
+785
+00:38:11,440 --> 00:38:17,200
+088
+
+786
+00:38:13,520 --> 00:38:22,000
+times this number that would be equals
+
+787
+00:38:17,200 --> 00:38:25,760
+this times this
+
+788
+00:38:22,000 --> 00:38:29,400
+it would be worth like a 0.03 03, right?
+
+789
+00:38:25,760 --> 00:38:29,400
+I think that's right.
+
+790
+00:38:29,680 --> 00:38:33,640
+Maybe it's divided by
+
+791
+00:38:34,320 --> 00:38:37,480
+Hold on.
+
+792
+00:38:37,599 --> 00:38:43,359
+Oh, that's correct. Yeah, because it's a
+
+793
+00:38:39,440 --> 00:38:46,720
+fraction of this. That makes sense. 0.03
+
+794
+00:38:43,359 --> 00:38:48,480
+777. Okay. Yeah, because again, this
+
+795
+00:38:46,720 --> 00:38:50,960
+would equal one when when the others are
+
+796
+00:38:48,480 --> 00:38:53,520
+composed together. So that means that
+
+797
+00:38:50,960 --> 00:38:56,240
+all raccoon keywords are all going to be
+
+798
+00:38:53,520 --> 00:38:58,560
+taking a share of this score if that
+
+799
+00:38:56,240 --> 00:39:00,880
+makes sense. And you've got in your
+
+800
+00:38:58,560 --> 00:39:04,079
+rankings
+
+801
+00:39:00,880 --> 00:39:09,119
+raccoon control and riverview is going
+
+802
+00:39:04,079 --> 00:39:12,400
+to be this many keywords like that. So
+
+803
+00:39:09,119 --> 00:39:14,160
+you could say um
+
+804
+00:39:12,400 --> 00:39:16,000
+that they're all equally weighted and
+
+805
+00:39:14,160 --> 00:39:18,480
+they all take an equal share. But we do
+
+806
+00:39:16,000 --> 00:39:20,480
+want to weight these
+
+807
+00:39:18,480 --> 00:39:22,240
+core keywords a little differently.
+
+808
+00:39:20,480 --> 00:39:25,040
+Actually, there's more here, right?
+
+809
+00:39:22,240 --> 00:39:30,520
+Raccoon removal near me, right? Those
+
+810
+00:39:25,040 --> 00:39:30,520
+ones. So we know that
+
+811
+00:39:30,880 --> 00:39:41,800
+amongst those there are core keywords
+
+812
+00:39:35,440 --> 00:39:41,800
+and there are um the uh geo keywords
+
+813
+00:39:42,400 --> 00:39:49,280
+and we're going to factor those as a
+
+814
+00:39:45,440 --> 00:39:54,160
+share by whatever we set this in the
+
+815
+00:39:49,280 --> 00:39:56,400
+config the um we'll call it the
+
+816
+00:39:54,160 --> 00:40:00,280
+I got to look at chatbt and and figure
+
+817
+00:39:56,400 --> 00:40:00,280
+out what we were calling it.
+
+818
+00:40:03,760 --> 00:40:10,119
+There's a kappa value and a uh
+
+819
+00:40:10,960 --> 00:40:15,160
+what's it called here? a split
+
+820
+00:40:19,119 --> 00:40:23,000
+call the partition split
+
+821
+00:40:24,320 --> 00:40:29,599
+and that's going to be between 0 and
+
+822
+00:40:25,920 --> 00:40:33,520
+one. So if we were to say 0
+
+823
+00:40:29,599 --> 00:40:38,560
+uh six six that means that the
+
+824
+00:40:33,520 --> 00:40:40,480
+everything between zero and 66 is
+
+825
+00:40:38,560 --> 00:40:43,839
+basically a score band that we would
+
+826
+00:40:40,480 --> 00:40:47,760
+consider um the core keywords and then
+
+827
+00:40:43,839 --> 00:40:50,320
+everything 66 and up to one which is 044
+
+828
+00:40:47,760 --> 00:40:52,160
+would be uh the share that's calculated
+
+829
+00:40:50,320 --> 00:40:54,320
+for the core keyword and then we would
+
+830
+00:40:52,160 --> 00:40:57,359
+have a kappa value and we would set the
+
+831
+00:40:54,320 --> 00:40:58,960
+kappa at maybe five or something to to
+
+832
+00:40:57,359 --> 00:41:02,640
+generate. Usually you'd be setting at
+
+833
+00:40:58,960 --> 00:41:04,319
+one for that straight line. Um, which we
+
+834
+00:41:02,640 --> 00:41:06,160
+could do for now and then we could test
+
+835
+00:41:04,319 --> 00:41:10,480
+the capillator, right? And change it
+
+836
+00:41:06,160 --> 00:41:12,960
+around. Not too big a deal. So, um, that
+
+837
+00:41:10,480 --> 00:41:17,200
+means those those first five keywords
+
+838
+00:41:12,960 --> 00:41:21,040
+share 66% of the total possible score in
+
+839
+00:41:17,200 --> 00:41:22,880
+terms of that area on a linear axis. And
+
+840
+00:41:21,040 --> 00:41:25,200
+if you were to increase the cappa then
+
+841
+00:41:22,880 --> 00:41:28,560
+this would only that that potential
+
+842
+00:41:25,200 --> 00:41:30,800
+would only increase. Uh how you doing?
+
+843
+00:41:28,560 --> 00:41:32,160
+Are you lost yet?
+
+844
+00:41:30,800 --> 00:41:35,920
+Still following.
+
+845
+00:41:32,160 --> 00:41:38,319
+Okay, good. Um so I've got the formula
+
+846
+00:41:35,920 --> 00:41:40,160
+like I I already had this written uh
+
+847
+00:41:38,319 --> 00:41:42,000
+because I figured I was going to like
+
+848
+00:41:40,160 --> 00:41:43,760
+throw it at you and then I didn't really
+
+849
+00:41:42,000 --> 00:41:45,200
+want to like
+
+850
+00:41:43,760 --> 00:41:48,400
+overwhelm you with it because it might
+
+851
+00:41:45,200 --> 00:41:50,720
+be kind of crazy. Um but you can see
+
+852
+00:41:48,400 --> 00:41:52,640
+here that we're adding these parameters
+
+853
+00:41:50,720 --> 00:41:54,160
+in right so you got a param which was
+
+854
+00:41:52,640 --> 00:41:55,680
+the number split which is that first one
+
+855
+00:41:54,160 --> 00:41:58,640
+we had which is a split point between
+
+856
+00:41:55,680 --> 00:41:59,839
+zero and one IG eg66
+
+857
+00:41:58,640 --> 00:42:01,920
+then you're just going to give it a list
+
+858
+00:41:59,839 --> 00:42:04,960
+of core keywords and a list of geo
+
+859
+00:42:01,920 --> 00:42:06,480
+keywords. So that's going to be you're
+
+860
+00:42:04,960 --> 00:42:09,200
+going to do a quick analysis on the
+
+861
+00:42:06,480 --> 00:42:11,040
+sheet only on Riverview, right? Let's
+
+862
+00:42:09,200 --> 00:42:12,800
+just only focus on this one thing
+
+863
+00:42:11,040 --> 00:42:14,880
+because you want to you want to compute
+
+864
+00:42:12,800 --> 00:42:16,560
+these in their own chunks. You don't
+
+865
+00:42:14,880 --> 00:42:17,839
+want to calculate Riverview and another
+
+866
+00:42:16,560 --> 00:42:19,599
+one at the same time because you're
+
+867
+00:42:17,839 --> 00:42:22,480
+trying to you're trying to divide up
+
+868
+00:42:19,599 --> 00:42:24,319
+shares and so you know that location is
+
+869
+00:42:22,480 --> 00:42:26,160
+like your big domain. So you don't want
+
+870
+00:42:24,319 --> 00:42:28,160
+to be crossing over locations and and
+
+871
+00:42:26,160 --> 00:42:30,160
+calculating shares for keywords in
+
+872
+00:42:28,160 --> 00:42:32,400
+Riverview against shares and other other
+
+873
+00:42:30,160 --> 00:42:36,160
+pieces because they they're irrespective
+
+874
+00:42:32,400 --> 00:42:38,400
+of each other if that makes sense. Um so
+
+875
+00:42:36,160 --> 00:42:40,160
+when you build this and you calculate
+
+876
+00:42:38,400 --> 00:42:42,960
+scores, you want to go location by
+
+877
+00:42:40,160 --> 00:42:44,720
+location, service by service,
+
+878
+00:42:42,960 --> 00:42:46,319
+location being first, then do service,
+
+879
+00:42:44,720 --> 00:42:50,640
+service, service. But you'll be doing
+
+880
+00:42:46,319 --> 00:42:51,920
+keyword calculations, right? So um when
+
+881
+00:42:50,640 --> 00:42:53,839
+you come down here, you got your core
+
+882
+00:42:51,920 --> 00:42:55,359
+keywords and your geo keywords. Let's go
+
+883
+00:42:53,839 --> 00:42:59,119
+back to the script so you can see the
+
+884
+00:42:55,359 --> 00:43:00,560
+logic in here. Um, so you're adding a
+
+885
+00:42:59,119 --> 00:43:02,319
+string of core keywords and you're
+
+886
+00:43:00,560 --> 00:43:04,800
+adding a string of geo keywords. Those
+
+887
+00:43:02,319 --> 00:43:06,960
+are literally just the actual values of
+
+888
+00:43:04,800 --> 00:43:08,480
+the keyword itself.
+
+889
+00:43:06,960 --> 00:43:10,560
+So it'll be wildlife pest control,
+
+890
+00:43:08,480 --> 00:43:13,119
+wildlife. We're talking about raccoons.
+
+891
+00:43:10,560 --> 00:43:15,599
+So you'd be doing your core keywords
+
+892
+00:43:13,119 --> 00:43:18,640
+would be raccoon removal, raccoon
+
+893
+00:43:15,599 --> 00:43:20,079
+trappers, raccoon removal.
+
+894
+00:43:18,640 --> 00:43:23,200
+Oh, it's a different it's spelled
+
+895
+00:43:20,079 --> 00:43:25,599
+differently. Oh, with one Z. Okay, good.
+
+896
+00:43:23,200 --> 00:43:28,160
+And then raccoon removal near me and
+
+897
+00:43:25,599 --> 00:43:30,400
+raccoon removal from attic. Right? So
+
+898
+00:43:28,160 --> 00:43:32,480
+you got five core keywords. You're
+
+899
+00:43:30,400 --> 00:43:35,119
+matching them against these. That's how
+
+900
+00:43:32,480 --> 00:43:37,040
+you develop that list. And then you've
+
+901
+00:43:35,119 --> 00:43:38,960
+got your your list of the location
+
+902
+00:43:37,040 --> 00:43:41,119
+modified. So that's your raccoon removal
+
+903
+00:43:38,960 --> 00:43:43,359
+riverview, your riverview raccoon
+
+904
+00:43:41,119 --> 00:43:46,000
+removal. So that's a list of like 10 and
+
+905
+00:43:43,359 --> 00:43:48,880
+the other one's a list of five. And they
+
+906
+00:43:46,000 --> 00:43:51,920
+are quite literally um
+
+907
+00:43:48,880 --> 00:43:53,839
+given to you.
+
+908
+00:43:51,920 --> 00:43:56,319
+Uh you're you're giving them the actual
+
+909
+00:43:53,839 --> 00:43:58,720
+string because the output object is
+
+910
+00:43:56,319 --> 00:44:02,800
+going to look like
+
+911
+00:43:58,720 --> 00:44:05,119
+um let me pull up a new
+
+912
+00:44:02,800 --> 00:44:08,640
+the output object is going to look like
+
+913
+00:44:05,119 --> 00:44:11,760
+you know raccoon removal
+
+914
+00:44:08,640 --> 00:44:15,200
+and it's going to say you know 0.01234
+
+915
+00:44:11,760 --> 00:44:16,880
+01 23 4 five or whatever, right? And
+
+916
+00:44:15,200 --> 00:44:19,440
+then you're going to have a comma and
+
+917
+00:44:16,880 --> 00:44:22,240
+it's just going to be this this list
+
+918
+00:44:19,440 --> 00:44:23,920
+that comes back of all of those
+
+919
+00:44:22,240 --> 00:44:26,880
+keywords. There'll be 15 of these
+
+920
+00:44:23,920 --> 00:44:29,839
+including the location modified, right?
+
+921
+00:44:26,880 --> 00:44:31,359
+Um, and then you'll you will go when
+
+922
+00:44:29,839 --> 00:44:34,720
+you're writing back to the sheet, you
+
+923
+00:44:31,359 --> 00:44:37,200
+will go look up riverview
+
+924
+00:44:34,720 --> 00:44:40,480
+uh and then you look up the the actual
+
+925
+00:44:37,200 --> 00:44:42,160
+keyword plus geo to find the row, right?
+
+926
+00:44:40,480 --> 00:44:45,040
+So, you're going to come in here. You're
+
+927
+00:44:42,160 --> 00:44:47,040
+going to search
+
+928
+00:44:45,040 --> 00:44:48,079
+basically through this entire list or
+
+929
+00:44:47,040 --> 00:44:50,160
+whatever. Actually, we're going to do it
+
+930
+00:44:48,079 --> 00:44:51,839
+over here because this is the cleaner
+
+931
+00:44:50,160 --> 00:44:54,240
+cleaner one. You're going to come here
+
+932
+00:44:51,839 --> 00:44:55,839
+and you're going to look for only
+
+933
+00:44:54,240 --> 00:44:58,880
+Riverview. And then you're going to go
+
+934
+00:44:55,839 --> 00:45:00,240
+look for keyword plus geo equals raccoon
+
+935
+00:44:58,880 --> 00:45:04,240
+removal. And then we're going to go into
+
+936
+00:45:00,240 --> 00:45:05,920
+that column and write the the um the
+
+937
+00:45:04,240 --> 00:45:09,160
+actual keyword score, which we'll we'll
+
+938
+00:45:05,920 --> 00:45:09,160
+add here.
+
+939
+00:45:10,240 --> 00:45:14,560
+And then of course we're going to have
+
+940
+00:45:12,000 --> 00:45:18,720
+one later for the ranking score which is
+
+941
+00:45:14,560 --> 00:45:21,040
+like a final step right. So you
+
+942
+00:45:18,720 --> 00:45:22,880
+basically produce an object from this
+
+943
+00:45:21,040 --> 00:45:24,640
+calculation. The script will do that for
+
+944
+00:45:22,880 --> 00:45:27,520
+you where it'll it'll make that output
+
+945
+00:45:24,640 --> 00:45:30,240
+object and it should give you the right
+
+946
+00:45:27,520 --> 00:45:34,160
+value. I have not tested it. It is not
+
+947
+00:45:30,240 --> 00:45:36,720
+very long. Right? That's the beauty of
+
+948
+00:45:34,160 --> 00:45:38,720
+you know math that makes sense and works
+
+949
+00:45:36,720 --> 00:45:40,720
+well. Right.
+
+950
+00:45:38,720 --> 00:45:42,240
+Um, and then of course it has a little a
+
+951
+00:45:40,720 --> 00:45:44,160
+little test here. I don't really know
+
+952
+00:45:42,240 --> 00:45:46,960
+how it's making it go. It's creating an
+
+953
+00:45:44,160 --> 00:45:48,240
+array from length 60. This is the thing
+
+954
+00:45:46,960 --> 00:45:50,079
+I don't understand. Like what are you
+
+955
+00:45:48,240 --> 00:45:52,880
+guys doing? Uh, I think it was just
+
+956
+00:45:50,079 --> 00:45:56,800
+trying to cheaply generate geo keywords
+
+957
+00:45:52,880 --> 00:45:59,599
+off of this. Um, as an example, uh, but
+
+958
+00:45:56,800 --> 00:46:01,040
+you can see that literally this is the
+
+959
+00:45:59,599 --> 00:46:03,599
+type of thing it's looking for with
+
+960
+00:46:01,040 --> 00:46:09,280
+keywords. It should be very easy to get
+
+961
+00:46:03,599 --> 00:46:11,520
+for you, right? Um, so that process will
+
+962
+00:46:09,280 --> 00:46:14,240
+write us out when you're when you're
+
+963
+00:46:11,520 --> 00:46:17,599
+factoring these inputs correctly. Um,
+
+964
+00:46:14,240 --> 00:46:18,960
+you're going to get a keyword score. Uh,
+
+965
+00:46:17,599 --> 00:46:23,160
+the only thing I think we're missing
+
+966
+00:46:18,960 --> 00:46:23,160
+here is that
+
+967
+00:46:24,079 --> 00:46:29,520
+we do keyword score.
+
+968
+00:46:27,760 --> 00:46:32,520
+Hold on. And then we got to multiply it
+
+969
+00:46:29,520 --> 00:46:32,520
+by
+
+970
+00:46:32,800 --> 00:46:35,800
+uh
+
+971
+00:46:36,240 --> 00:46:46,680
+I got to add this in. say, "Hey, for the
+
+972
+00:46:39,359 --> 00:46:46,680
+script, uh, we need to add in a param
+
+973
+00:46:48,240 --> 00:46:54,640
+to multiply
+
+974
+00:46:51,119 --> 00:47:00,880
+the uh
+
+975
+00:46:54,640 --> 00:47:04,160
+the keyword scores by a single location
+
+976
+00:47:00,880 --> 00:47:09,040
+um score
+
+977
+00:47:04,160 --> 00:47:09,040
+or location service score, right?
+
+978
+00:47:09,119 --> 00:47:12,880
+because we're having to do this times
+
+979
+00:47:10,720 --> 00:47:15,920
+this.
+
+980
+00:47:12,880 --> 00:47:21,359
+Actually, I don't think it
+
+981
+00:47:15,920 --> 00:47:22,800
+is required at that level. Hold on.
+
+982
+00:47:21,359 --> 00:47:25,359
+There's just a step where these things
+
+983
+00:47:22,800 --> 00:47:27,920
+get factored, right? Um, so I'm just
+
+984
+00:47:25,359 --> 00:47:29,599
+trying to figure out
+
+985
+00:47:27,920 --> 00:47:32,160
+whether we should bake that into this
+
+986
+00:47:29,599 --> 00:47:34,240
+script or keep it separate and handle it
+
+987
+00:47:32,160 --> 00:47:36,640
+at the end.
+
+988
+00:47:34,240 --> 00:47:39,640
+uh is actually a good engineering
+
+989
+00:47:36,640 --> 00:47:39,640
+question.
+
+990
+00:47:39,920 --> 00:47:44,119
+So we could permute a
+
+991
+00:47:44,960 --> 00:47:49,040
+well the geo scores are always going to
+
+992
+00:47:47,520 --> 00:47:51,280
+be I think you want to do it at this
+
+993
+00:47:49,040 --> 00:47:56,240
+step because the geo scores are always
+
+994
+00:47:51,280 --> 00:47:59,240
+going to be um a factor of
+
+995
+00:47:56,240 --> 00:47:59,240
+uh
+
+996
+00:48:01,359 --> 00:48:05,520
+that basically they'd always be the same
+
+997
+00:48:03,200 --> 00:48:09,599
+if you weren't
+
+998
+00:48:05,520 --> 00:48:14,160
+factoring um
+
+999
+00:48:09,599 --> 00:48:15,680
+Actually, this is a good good question
+
+1000
+00:48:14,160 --> 00:48:17,839
+and I might have to think about it a
+
+1001
+00:48:15,680 --> 00:48:21,359
+little bit more.
+
+1002
+00:48:17,839 --> 00:48:22,880
+Um, but the the question is usually like
+
+1003
+00:48:21,359 --> 00:48:24,000
+if you're creating all these scores at
+
+1004
+00:48:22,880 --> 00:48:26,079
+the end of the day when you look at one
+
+1005
+00:48:24,000 --> 00:48:27,839
+of those weird math equations, it's just
+
+1006
+00:48:26,079 --> 00:48:29,200
+saying we're going to take this score
+
+1007
+00:48:27,839 --> 00:48:30,400
+and we're going to multiply it by this
+
+1008
+00:48:29,200 --> 00:48:31,359
+score and then we're going to add this
+
+1009
+00:48:30,400 --> 00:48:33,119
+score and then we're going to divide
+
+1010
+00:48:31,359 --> 00:48:34,559
+them all by this score. Right? That's
+
+1011
+00:48:33,119 --> 00:48:36,400
+usually what you're looking at even
+
+1012
+00:48:34,559 --> 00:48:40,319
+though it's all crazy letters and
+
+1013
+00:48:36,400 --> 00:48:43,920
+numbers and stuff. Um so the then the
+
+1014
+00:48:40,319 --> 00:48:45,839
+question becomes um do we want to as
+
+1015
+00:48:43,920 --> 00:48:47,920
+this progresses be making those
+
+1016
+00:48:45,839 --> 00:48:51,119
+calculations or do we want to take
+
+1017
+00:48:47,920 --> 00:48:53,760
+produce a list of scores um then produce
+
+1018
+00:48:51,119 --> 00:48:57,440
+a list of modified scores then produce a
+
+1019
+00:48:53,760 --> 00:49:03,880
+list of like fully rank qualified
+
+1020
+00:48:57,440 --> 00:49:03,880
+scores. Um, and I kind of want to
+
+1021
+00:49:06,800 --> 00:49:15,040
+I kind of want to keep the keyword score
+
+1022
+00:49:10,880 --> 00:49:16,720
+um as brain dead as possible. So, it it
+
+1023
+00:49:15,040 --> 00:49:19,520
+means that we're going to be doing a lot
+
+1024
+00:49:16,720 --> 00:49:21,599
+of calculations
+
+1025
+00:49:19,520 --> 00:49:24,400
+uh
+
+1026
+00:49:21,599 --> 00:49:27,040
+specifically.
+
+1027
+00:49:24,400 --> 00:49:29,200
+Yeah, that's fine. I don't mind handling
+
+1028
+00:49:27,040 --> 00:49:32,319
+them in layers.
+
+1029
+00:49:29,200 --> 00:49:35,359
+So, we won't worry about pushing a
+
+1030
+00:49:32,319 --> 00:49:36,480
+location and niche score in there
+
+1031
+00:49:35,359 --> 00:49:40,880
+because we're just going to do that all
+
+1032
+00:49:36,480 --> 00:49:42,800
+at the end in our uh in our rank
+
+1033
+00:49:40,880 --> 00:49:45,280
+calculation. It means we're going to add
+
+1034
+00:49:42,800 --> 00:49:48,400
+a third column. Basically,
+
+1035
+00:49:45,280 --> 00:49:51,680
+we're going to have our um keyword
+
+1036
+00:49:48,400 --> 00:49:53,280
+score, our rank modifier, um and then a
+
+1037
+00:49:51,680 --> 00:49:55,839
+final score. And the final score is
+
+1038
+00:49:53,280 --> 00:49:57,520
+going to be everything zipped up. Uh,
+
+1039
+00:49:55,839 --> 00:49:59,839
+and then that'll be the number we use
+
+1040
+00:49:57,520 --> 00:50:02,640
+for the keyword itself to say, okay,
+
+1041
+00:49:59,839 --> 00:50:04,480
+this keyword in Riverview is worth this
+
+1042
+00:50:02,640 --> 00:50:08,640
+at this rank, right? If we're ranked
+
+1043
+00:50:04,480 --> 00:50:11,599
+number one, we get this boost. Um, so
+
+1044
+00:50:08,640 --> 00:50:15,760
+that's all we do. So, you got a keyword
+
+1045
+00:50:11,599 --> 00:50:19,200
+score, rank modifier score,
+
+1046
+00:50:15,760 --> 00:50:22,160
+and then a final score.
+
+1047
+00:50:19,200 --> 00:50:24,319
+So the final score,
+
+1048
+00:50:22,160 --> 00:50:27,280
+the the rank modifier score is just
+
+1049
+00:50:24,319 --> 00:50:29,839
+going to be a measure of how we want to
+
+1050
+00:50:27,280 --> 00:50:35,720
+handle um
+
+1051
+00:50:29,839 --> 00:50:35,720
+we'll say uh rank modification kappa.
+
+1052
+00:50:37,119 --> 00:50:44,400
+Let's do the same thing.
+
+1053
+00:50:40,319 --> 00:50:46,160
+So the way I want to handle um the kappa
+
+1054
+00:50:44,400 --> 00:50:47,920
+is the same thing, right? Where it does
+
+1055
+00:50:46,160 --> 00:50:50,720
+like the linear. So, we're going to
+
+1056
+00:50:47,920 --> 00:50:53,680
+actually put this at like a a 10, I
+
+1057
+00:50:50,720 --> 00:50:55,359
+guess. Um, where we know the first one
+
+1058
+00:50:53,680 --> 00:50:57,200
+is worth a lot and the second one is
+
+1059
+00:50:55,359 --> 00:50:58,640
+worth way less but still worth more than
+
+1060
+00:50:57,200 --> 00:50:59,760
+the rest. And then as you get further
+
+1061
+00:50:58,640 --> 00:51:03,200
+out to 10, they're just like worth
+
+1062
+00:50:59,760 --> 00:51:05,839
+almost nothing, right? And, um, I don't
+
+1063
+00:51:03,200 --> 00:51:09,520
+think the 10 has anything to do with the
+
+1064
+00:51:05,839 --> 00:51:13,359
+actual rank we're checking. Um,
+
+1065
+00:51:09,520 --> 00:51:16,880
+but what I'm thinking is
+
+1066
+00:51:13,359 --> 00:51:18,480
+if you if you see a ranking above 10,
+
+1067
+00:51:16,880 --> 00:51:21,119
+you're just basically counting it as
+
+1068
+00:51:18,480 --> 00:51:25,200
+worth nothing, right? So, this this 12
+
+1069
+00:51:21,119 --> 00:51:30,480
+would be a zero effectively. Um, I'm
+
+1070
+00:51:25,200 --> 00:51:33,680
+kind of curious. Road control squirrels.
+
+1071
+00:51:30,480 --> 00:51:35,680
+He's not doing too bad there. Um,
+
+1072
+00:51:33,680 --> 00:51:38,319
+even here, he seems a little weak on
+
+1073
+00:51:35,680 --> 00:51:40,720
+squirrel. Squirrel
+
+1074
+00:51:38,319 --> 00:51:43,359
+removal
+
+1075
+00:51:40,720 --> 00:51:47,040
+pretty good. Squirrel pest removal.
+
+1076
+00:51:43,359 --> 00:51:49,440
+Using words like pest exterminator
+
+1077
+00:51:47,040 --> 00:51:50,640
+definitely weaker but still not bad. You
+
+1078
+00:51:49,440 --> 00:51:54,640
+know what I mean? Like he's ranked four
+
+1079
+00:51:50,640 --> 00:51:57,760
+or five. Could be worse. What were the
+
+1080
+00:51:54,640 --> 00:52:00,319
+What's Riverview's worth? 0088. I want
+
+1081
+00:51:57,760 --> 00:52:03,359
+to say St. Petersburg.
+
+1082
+00:52:00,319 --> 00:52:07,319
+That was the big one, right?
+
+1083
+00:52:03,359 --> 00:52:07,319
+Let's go check St. Petersburg.
+
+1084
+00:52:08,640 --> 00:52:11,880
+St. Peters.
+
+1085
+00:52:13,440 --> 00:52:18,800
+What the hell?
+
+1086
+00:52:16,160 --> 00:52:21,200
+I'm getting too excited here. Wow. St.
+
+1087
+00:52:18,800 --> 00:52:23,680
+Petersburg seems to be ranking quite a
+
+1088
+00:52:21,200 --> 00:52:24,960
+bit over in Trinity.
+
+1089
+00:52:23,680 --> 00:52:27,359
+Not great though. Look at those
+
+1090
+00:52:24,960 --> 00:52:30,880
+rankings. Aren't very good. Temple
+
+1091
+00:52:27,359 --> 00:52:34,559
+Terrace. There we go.
+
+1092
+00:52:30,880 --> 00:52:36,160
+A lot of ones, threes, twos.
+
+1093
+00:52:34,559 --> 00:52:39,880
+We could get these raccoons higher would
+
+1094
+00:52:36,160 --> 00:52:39,880
+be a big boost for him.
+
+1095
+00:52:41,520 --> 00:52:47,359
+Not bad overall in St. Petersburg for it
+
+1096
+00:52:43,680 --> 00:52:50,559
+being worth so much.
+
+1097
+00:52:47,359 --> 00:52:53,200
+Did we do a surge over there?
+
+1098
+00:52:50,559 --> 00:52:54,480
+Uh yeah, I think we did uh one for St.
+
+1099
+00:52:53,200 --> 00:52:56,800
+Petersburg.
+
+1100
+00:52:54,480 --> 00:53:00,839
+Aha.
+
+1101
+00:52:56,800 --> 00:53:00,839
+Look at those results, baby.
+
+1102
+00:53:01,920 --> 00:53:05,599
+So yeah, I'm actually quite pleased with
+
+1103
+00:53:03,520 --> 00:53:06,640
+that because you know, you you look at
+
+1104
+00:53:05,599 --> 00:53:08,960
+this and you're like, man, St.
+
+1105
+00:53:06,640 --> 00:53:10,559
+Petersburg is worth so much and then
+
+1106
+00:53:08,960 --> 00:53:12,480
+we're just slapping it over there. So
+
+1107
+00:53:10,559 --> 00:53:15,520
+this gives you really good if the surge
+
+1108
+00:53:12,480 --> 00:53:18,800
+is effective in what it does. This gives
+
+1109
+00:53:15,520 --> 00:53:20,880
+you a really good target list for surges
+
+1110
+00:53:18,800 --> 00:53:21,839
+so you're not wasting time. You know
+
+1111
+00:53:20,880 --> 00:53:22,559
+what I mean,
+
+1112
+00:53:21,839 --> 00:53:24,800
+right?
+
+1113
+00:53:22,559 --> 00:53:28,559
+Um which is quite cool because you can
+
+1114
+00:53:24,800 --> 00:53:33,880
+have an impact for sure. Uh so where
+
+1115
+00:53:28,559 --> 00:53:33,880
+were we? Uh raccoon.
+
+1116
+00:53:34,000 --> 00:53:39,200
+Uh all right. So we were going to
+
+1117
+00:53:35,440 --> 00:53:41,760
+calculate these scores, right? So
+
+1118
+00:53:39,200 --> 00:53:43,440
+in the rank score, sorry, I know this is
+
+1119
+00:53:41,760 --> 00:53:45,280
+taking a while, but I'm hoping to kind
+
+1120
+00:53:43,440 --> 00:53:46,559
+of get some of this across because I I
+
+1121
+00:53:45,280 --> 00:53:48,559
+want to give you enough that you can
+
+1122
+00:53:46,559 --> 00:53:52,800
+start working this
+
+1123
+00:53:48,559 --> 00:53:55,359
+um and and deal with these pieces. Uh
+
+1124
+00:53:52,800 --> 00:53:57,359
+let's go back to I think this is it. We
+
+1125
+00:53:55,359 --> 00:54:00,400
+are we are actually here. So you got a
+
+1126
+00:53:57,359 --> 00:54:01,920
+keyword score, a rank modifier score. We
+
+1127
+00:54:00,400 --> 00:54:04,720
+already talked about how to calculate
+
+1128
+00:54:01,920 --> 00:54:07,200
+that. It's basically this formula. The
+
+1129
+00:54:04,720 --> 00:54:10,160
+challenge you're going to have is and
+
+1130
+00:54:07,200 --> 00:54:12,880
+I'll give you this right now.
+
+1131
+00:54:10,160 --> 00:54:17,240
+Copy this code. I'll even share the chat
+
+1132
+00:54:12,880 --> 00:54:17,240
+with you if it's useful.
+
+1133
+00:54:18,160 --> 00:54:23,319
+Copy the link. See if you can see this.
+
+1134
+00:54:24,720 --> 00:54:27,720
+All right.
+
+1135
+00:54:40,960 --> 00:54:45,640
+I want to try checking this in a
+
+1136
+00:54:42,480 --> 00:54:45,640
+different browser.
+
+1137
+00:54:53,680 --> 00:54:59,359
+Yeah, chat open.
+
+1138
+00:54:56,800 --> 00:55:00,960
+Interesting.
+
+1139
+00:54:59,359 --> 00:55:04,680
+Should check and see if uh we can get
+
+1140
+00:55:00,960 --> 00:55:04,680
+links out from this
+
+1141
+00:55:06,640 --> 00:55:11,559
+cuz I'm not logged in. You see that?
+
+1142
+00:55:13,119 --> 00:55:15,920
+Yeah.
+
+1143
+00:55:14,319 --> 00:55:21,359
+That would be a good experiment. See if
+
+1144
+00:55:15,920 --> 00:55:25,119
+you can't um get it to put links in.
+
+1145
+00:55:21,359 --> 00:55:26,800
+You to go uh get it to write an entire
+
+1146
+00:55:25,119 --> 00:55:32,079
+article about squirrel removal and say,
+
+1147
+00:55:26,800 --> 00:55:34,800
+"Hey, uh can you tell me what the um
+
+1148
+00:55:32,079 --> 00:55:41,640
+squirrel removal
+
+1149
+00:55:34,800 --> 00:55:41,640
+page URL is for AAAC wildlife removal
+
+1150
+00:55:43,680 --> 00:55:46,800
+of Tampa?
+
+1151
+00:55:50,160 --> 00:55:56,760
+There's a link out here. Source here.
+
+1152
+00:55:53,359 --> 00:55:56,760
+Share chat.
+
+1153
+00:55:57,839 --> 00:56:03,680
+Copy link.
+
+1154
+00:56:01,040 --> 00:56:05,839
+Go over here.
+
+1155
+00:56:03,680 --> 00:56:08,839
+Paste this in. Sorry, I'm getting on a
+
+1156
+00:56:05,839 --> 00:56:08,839
+tangent.
+
+1157
+00:56:09,040 --> 00:56:12,680
+Inspect element.
+
+1158
+00:56:36,000 --> 00:56:42,280
+Maybe the page source isn't the right
+
+1159
+00:56:37,599 --> 00:56:42,280
+one. Inspect element.
+
+1160
+00:57:03,520 --> 00:57:07,960
+Oh, it tries to take you off page.
+
+1161
+00:57:23,440 --> 00:57:27,119
+Interesting.
+
+1162
+00:57:25,200 --> 00:57:30,520
+Yeah. I wonder if this uh stops it from
+
+1163
+00:57:27,119 --> 00:57:30,520
+being worthwhile.
+
+1164
+00:57:36,480 --> 00:57:41,599
+I have to assume we would have heard
+
+1165
+00:57:37,920 --> 00:57:43,280
+about this if uh it was so easy.
+
+1166
+00:57:41,599 --> 00:57:44,640
+Yeah.
+
+1167
+00:57:43,280 --> 00:57:50,200
+But always something worth testing,
+
+1168
+00:57:44,640 --> 00:57:50,200
+right? Um anyway uh
+
+1169
+00:57:51,520 --> 00:57:55,359
+so
+
+1170
+00:57:53,520 --> 00:57:59,200
+we calculate
+
+1171
+00:57:55,359 --> 00:58:04,880
+the the keyword score which is just that
+
+1172
+00:57:59,200 --> 00:58:06,720
+um that analysis right of the uh
+
+1173
+00:58:04,880 --> 00:58:08,960
+the full potential of those things. And
+
+1174
+00:58:06,720 --> 00:58:13,760
+this what you'll notice when you do this
+
+1175
+00:58:08,960 --> 00:58:16,079
+is that they'll repeat, right?
+
+1176
+00:58:13,760 --> 00:58:18,319
+Like wildlife pest control is always
+
+1177
+00:58:16,079 --> 00:58:20,960
+going to be worth the same keyword score
+
+1178
+00:58:18,319 --> 00:58:22,000
+regardless of location and so are these
+
+1179
+00:58:20,960 --> 00:58:24,160
+other terms.
+
+1180
+00:58:22,000 --> 00:58:26,400
+If we're if we're not multiplying that
+
+1181
+00:58:24,160 --> 00:58:28,160
+other number there,
+
+1182
+00:58:26,400 --> 00:58:32,280
+um then those keywords are going to be
+
+1183
+00:58:28,160 --> 00:58:32,280
+work uh
+
+1184
+00:58:32,480 --> 00:58:37,200
+what is it? [ __ ] So wildlife pest
+
+1185
+00:58:35,520 --> 00:58:39,760
+control is going to be the work the same
+
+1186
+00:58:37,200 --> 00:58:41,200
+in Riverview as it is in Newport Richie
+
+1187
+00:58:39,760 --> 00:58:44,000
+as it is in everything else because
+
+1188
+00:58:41,200 --> 00:58:45,920
+we're not multiplying the location or
+
+1189
+00:58:44,000 --> 00:58:47,920
+the niche pieces in there. So they'll
+
+1190
+00:58:45,920 --> 00:58:49,839
+all be normalized against themselves if
+
+1191
+00:58:47,920 --> 00:58:53,680
+that makes sense. Like that whole set of
+
+1192
+00:58:49,839 --> 00:58:56,319
+raccoon ones will be worth one uh no
+
+1193
+00:58:53,680 --> 00:58:58,799
+matter what. And then so the Newport
+
+1194
+00:58:56,319 --> 00:59:01,440
+Richie raccoon removal will be worth the
+
+1195
+00:58:58,799 --> 00:59:02,640
+same as um St. Petersburg raccoon
+
+1196
+00:59:01,440 --> 00:59:06,400
+removal because they're the same
+
+1197
+00:59:02,640 --> 00:59:08,480
+pattern, right? Um, so, uh, you'll
+
+1198
+00:59:06,400 --> 00:59:11,520
+notice that those scores look very
+
+1199
+00:59:08,480 --> 00:59:14,480
+similar when you run it just that way
+
+1200
+00:59:11,520 --> 00:59:16,160
+down the list because they are in fact
+
+1201
+00:59:14,480 --> 00:59:17,599
+the exact same calculation happening,
+
+1202
+00:59:16,160 --> 00:59:20,400
+which is why I was kind of hung up. I
+
+1203
+00:59:17,599 --> 00:59:22,400
+was like, is it worth doing that and and
+
+1204
+00:59:20,400 --> 00:59:24,880
+putting them there? But in fact, it it
+
+1205
+00:59:22,400 --> 00:59:27,119
+is because it's easier to audit the
+
+1206
+00:59:24,880 --> 00:59:29,520
+actual math at the end of the day. Um
+
+1207
+00:59:27,119 --> 00:59:31,680
+because we have discrete scores in all
+
+1208
+00:59:29,520 --> 00:59:33,920
+the columns and we can take a sample and
+
+1209
+00:59:31,680 --> 00:59:37,520
+add them up and see if they make sense.
+
+1210
+00:59:33,920 --> 00:59:39,119
+Um because they should, right? Uh so so
+
+1211
+00:59:37,520 --> 00:59:40,640
+that those keyword scores will be pretty
+
+1212
+00:59:39,119 --> 00:59:42,799
+linear set. And then you're going to do
+
+1213
+00:59:40,640 --> 00:59:45,839
+this rank score which is basically just
+
+1214
+00:59:42,799 --> 00:59:49,839
+going to be like this number exists on a
+
+1215
+00:59:45,839 --> 00:59:52,000
+plane from 1 to 10. If it's if it's
+
+1216
+00:59:49,839 --> 00:59:55,200
+worth more than 10, it's it's worth
+
+1217
+00:59:52,000 --> 00:59:57,440
+zero, right? Uh and then we're just
+
+1218
+00:59:55,200 --> 00:59:59,599
+going to apply a very simple curve
+
+1219
+00:59:57,440 --> 01:00:01,359
+analysis, too. We'll have a kappa in
+
+1220
+00:59:59,599 --> 01:00:03,280
+there. So, we can we can make it linear
+
+1221
+01:00:01,359 --> 01:00:04,799
+or we can make it bend really hard, but
+
+1222
+01:00:03,280 --> 01:00:06,559
+we're going to say one is worth this,
+
+1223
+01:00:04,799 --> 01:00:08,160
+two is worth that. And that'll be that
+
+1224
+01:00:06,559 --> 01:00:10,000
+other column, too. And those are all
+
+1225
+01:00:08,160 --> 01:00:12,319
+going to look the same as well because
+
+1226
+01:00:10,000 --> 01:00:15,440
+that should be a flat calculation and
+
+1227
+01:00:12,319 --> 01:00:18,000
+it's irrespective of other calculations,
+
+1228
+01:00:15,440 --> 01:00:19,920
+if that makes sense. And then that last
+
+1229
+01:00:18,000 --> 01:00:22,559
+score is going to take all the other
+
+1230
+01:00:19,920 --> 01:00:24,720
+scores together and factor them. It'll
+
+1231
+01:00:22,559 --> 01:00:27,040
+be this keyword is going to be this
+
+1232
+01:00:24,720 --> 01:00:28,799
+location score times this niche score
+
+1233
+01:00:27,040 --> 01:00:31,359
+times this keyword score times this
+
+1234
+01:00:28,799 --> 01:00:34,000
+ranking score. And the final score is
+
+1235
+01:00:31,359 --> 01:00:36,319
+that. You see what I mean? And then that
+
+1236
+01:00:34,000 --> 01:00:38,799
+final score on all those is the gold
+
+1237
+01:00:36,319 --> 01:00:41,359
+mine because it tells you how much your
+
+1238
+01:00:38,799 --> 01:00:43,599
+rankings are worth
+
+1239
+01:00:41,359 --> 01:00:46,720
+versus assuming what your rankings are
+
+1240
+01:00:43,599 --> 01:00:49,440
+worth. And I can guarant [ __ ] te you
+
+1241
+01:00:46,720 --> 01:00:51,680
+that nobody else has that in their
+
+1242
+01:00:49,440 --> 01:00:53,920
+system. It is a unique novel product
+
+1243
+01:00:51,680 --> 01:00:57,040
+that doesn't exist. And think of it like
+
+1244
+01:00:53,920 --> 01:00:59,359
+this. Not only can you do that for your
+
+1245
+01:00:57,040 --> 01:01:01,359
+company, you can do it for all the
+
+1246
+01:00:59,359 --> 01:01:04,000
+competitors at the same time because you
+
+1247
+01:01:01,359 --> 01:01:07,040
+have that raw response format stuff. So
+
+1248
+01:01:04,000 --> 01:01:09,520
+you can literally see market share by
+
+1249
+01:01:07,040 --> 01:01:11,280
+organic search penetration
+
+1250
+01:01:09,520 --> 01:01:14,079
+on those terms for that you're competing
+
+1251
+01:01:11,280 --> 01:01:16,160
+for. So you know who's your big
+
+1252
+01:01:14,079 --> 01:01:17,839
+competitor and where are they? You can
+
+1253
+01:01:16,160 --> 01:01:19,440
+see when you go into Riverview it's this
+
+1254
+01:01:17,839 --> 01:01:21,839
+guy, but when you go into St. Petersburg
+
+1255
+01:01:19,440 --> 01:01:23,119
+it's this guy.
+
+1256
+01:01:21,839 --> 01:01:25,280
+Who are you fighting against and where
+
+1257
+01:01:23,119 --> 01:01:27,920
+are you fighting them? Very interesting.
+
+1258
+01:01:25,280 --> 01:01:30,000
+The map stuff is similar like the geog
+
+1259
+01:01:27,920 --> 01:01:33,520
+grids, but it doesn't come it doesn't
+
+1260
+01:01:30,000 --> 01:01:35,200
+bring with it the value part, the actual
+
+1261
+01:01:33,520 --> 01:01:37,119
+money.
+
+1262
+01:01:35,200 --> 01:01:40,880
+You know what I mean? That's left as an
+
+1263
+01:01:37,119 --> 01:01:43,440
+assumption. Um, and that's that's I
+
+1264
+01:01:40,880 --> 01:01:45,359
+think the killer piece is like money
+
+1265
+01:01:43,440 --> 01:01:48,240
+times population and then you do your
+
+1266
+01:01:45,359 --> 01:01:50,559
+rank assumption and you're valuing your
+
+1267
+01:01:48,240 --> 01:01:52,480
+service against your other services and
+
+1268
+01:01:50,559 --> 01:01:54,720
+what the market could provide. Am I
+
+1269
+01:01:52,480 --> 01:01:57,359
+targeting the right service, you know?
+
+1270
+01:01:54,720 --> 01:02:00,079
+Um, so there's some some cool [ __ ] to be
+
+1271
+01:01:57,359 --> 01:02:01,839
+found in here uh as we figure this out
+
+1272
+01:02:00,079 --> 01:02:06,240
+because again, like I said, nobody's got
+
+1273
+01:02:01,839 --> 01:02:08,319
+that. um if our if our data for SEO
+
+1274
+01:02:06,240 --> 01:02:09,599
+rankings are accurate. That's like the
+
+1275
+01:02:08,319 --> 01:02:12,000
+big question because they're sort of the
+
+1276
+01:02:09,599 --> 01:02:14,799
+cheapest, right? Um I have no idea how
+
+1277
+01:02:12,000 --> 01:02:17,440
+many credits we're burning through
+
+1278
+01:02:14,799 --> 01:02:19,599
+as we do this. Um but you know, the
+
+1279
+01:02:17,440 --> 01:02:22,000
+cheapest the cheaper your rank tracking,
+
+1280
+01:02:19,599 --> 01:02:26,640
+the better. Um and you may even be able
+
+1281
+01:02:22,000 --> 01:02:29,040
+to uh segment your your keyword plus geo
+
+1282
+01:02:26,640 --> 01:02:31,440
+to a different rank tracker from your
+
+1283
+01:02:29,040 --> 01:02:33,599
+your more important terms. So, as the
+
+1284
+01:02:31,440 --> 01:02:36,079
+keywords become less important, you use
+
+1285
+01:02:33,599 --> 01:02:37,920
+a a cheaper method of researching them,
+
+1286
+01:02:36,079 --> 01:02:39,520
+but the the the really important
+
+1287
+01:02:37,920 --> 01:02:40,960
+keywords you're really rank tracking and
+
+1288
+01:02:39,520 --> 01:02:42,240
+checking because that's it matters to
+
+1289
+01:02:40,960 --> 01:02:46,480
+get those right. So, you might use a
+
+1290
+01:02:42,240 --> 01:02:49,920
+different API um on that one. Uh so,
+
+1291
+01:02:46,480 --> 01:02:52,000
+anyway, this is uh basically what's
+
+1292
+01:02:49,920 --> 01:02:56,240
+going on here. So what what you should
+
+1293
+01:02:52,000 --> 01:03:00,000
+do is you're basically making a series
+
+1294
+01:02:56,240 --> 01:03:01,839
+of distinct scripts, right, that are
+
+1295
+01:03:00,000 --> 01:03:05,920
+going to do different things. The
+
+1296
+01:03:01,839 --> 01:03:07,359
+location one is pretty pretty simple in
+
+1297
+01:03:05,920 --> 01:03:10,160
+the sense that I've already given you a
+
+1298
+01:03:07,359 --> 01:03:14,240
+formula right here. You calculate the
+
+1299
+01:03:10,160 --> 01:03:17,839
+numerical which is this. what is the uh
+
+1300
+01:03:14,240 --> 01:03:21,119
+income minus poverty times population
+
+1301
+01:03:17,839 --> 01:03:23,599
+and then calculate them all sum them
+
+1302
+01:03:21,119 --> 01:03:26,720
+together and then normalize which is
+
+1303
+01:03:23,599 --> 01:03:28,799
+this process and if you say normalize to
+
+1304
+01:03:26,720 --> 01:03:31,520
+the to the AI it's going to understand
+
+1305
+01:03:28,799 --> 01:03:32,799
+what you mean it's a very common term
+
+1306
+01:03:31,520 --> 01:03:35,440
+you're saying I'm looking to calculate a
+
+1307
+01:03:32,799 --> 01:03:36,880
+normalized score of this equation across
+
+1308
+01:03:35,440 --> 01:03:40,319
+this set and it should be able to be
+
+1309
+01:03:36,880 --> 01:03:41,839
+like and then you you calculate that you
+
+1310
+01:03:40,319 --> 01:03:43,760
+write it into the sheet and get all
+
+1311
+01:03:41,839 --> 01:03:46,000
+those normalized scores in there and
+
+1312
+01:03:43,760 --> 01:03:49,119
+then you know sense check them because
+
+1313
+01:03:46,000 --> 01:03:50,960
+you can write the formula yourself right
+
+1314
+01:03:49,119 --> 01:03:52,160
+as well and see if it got it right.
+
+1315
+01:03:50,960 --> 01:03:53,920
+That's called making sure the math
+
+1316
+01:03:52,160 --> 01:03:57,039
+match.
+
+1317
+01:03:53,920 --> 01:03:59,280
+Um so then then doing the same thing uh
+
+1318
+01:03:57,039 --> 01:04:01,920
+with the the service piece is is
+
+1319
+01:03:59,280 --> 01:04:04,000
+important. Um
+
+1320
+01:04:01,920 --> 01:04:06,480
+let's see
+
+1321
+01:04:04,000 --> 01:04:08,720
+that should be straightforward because
+
+1322
+01:04:06,480 --> 01:04:10,400
+services are
+
+1323
+01:04:08,720 --> 01:04:12,240
+or like the niche you're going to have
+
+1324
+01:04:10,400 --> 01:04:14,319
+that data. So you're literally plugging
+
+1325
+01:04:12,240 --> 01:04:17,599
+this in and then you're just doing a
+
+1326
+01:04:14,319 --> 01:04:19,359
+normalization on those, right? So if
+
+1327
+01:04:17,599 --> 01:04:20,799
+you're leaving out rat or whatever
+
+1328
+01:04:19,359 --> 01:04:22,799
+you're not tracking, even though it
+
+1329
+01:04:20,799 --> 01:04:25,520
+might exist in that other sheet and give
+
+1330
+01:04:22,799 --> 01:04:27,359
+you a weird number, you know that these
+
+1331
+01:04:25,520 --> 01:04:30,160
+three numbers added together are going
+
+1332
+01:04:27,359 --> 01:04:31,520
+to equal one when normalized. Right.
+
+1333
+01:04:30,160 --> 01:04:34,000
+Because if you add these all together,
+
+1334
+01:04:31,520 --> 01:04:35,119
+they equal one,
+
+1335
+01:04:34,000 --> 01:04:38,480
+right?
+
+1336
+01:04:35,119 --> 01:04:40,880
+Right. If we did the sum,
+
+1337
+01:04:38,480 --> 01:04:43,520
+yeah, it equals one. See?
+
+1338
+01:04:40,880 --> 01:04:46,880
+So you got to normalize the niche,
+
+1339
+01:04:43,520 --> 01:04:49,039
+normalize the the location calculation.
+
+1340
+01:04:46,880 --> 01:04:54,960
+Then the keyword I've kind of given you
+
+1341
+01:04:49,039 --> 01:04:57,440
+that uh code at least generally. Um so
+
+1342
+01:04:54,960 --> 01:05:03,440
+the trick in that one is going to be
+
+1343
+01:04:57,440 --> 01:05:06,160
+first locating the uh
+
+1344
+01:05:03,440 --> 01:05:08,559
+like dividing these by location and geo
+
+1345
+01:05:06,160 --> 01:05:12,000
+first of all dividing them by service
+
+1346
+01:05:08,559 --> 01:05:14,240
+and then con considering service and geo
+
+1347
+01:05:12,000 --> 01:05:15,920
+as like a bucket that is distinct from
+
+1348
+01:05:14,240 --> 01:05:18,000
+all other buckets and you're calculating
+
+1349
+01:05:15,920 --> 01:05:19,920
+your scores on this and then you have to
+
+1350
+01:05:18,000 --> 01:05:22,960
+figure out which of these are core
+
+1351
+01:05:19,920 --> 01:05:25,839
+keywords and which of them are location
+
+1352
+01:05:22,960 --> 01:05:27,280
+uh keywords, right? Or geo keywords.
+
+1353
+01:05:25,839 --> 01:05:30,079
+Treat them and sort them into their
+
+1354
+01:05:27,280 --> 01:05:33,839
+separate buckets. Calculate their scores
+
+1355
+01:05:30,079 --> 01:05:36,720
+and then look these up again by finding
+
+1356
+01:05:33,839 --> 01:05:38,559
+the service plus the keyword plus geo or
+
+1357
+01:05:36,720 --> 01:05:40,160
+sorry not the service the the geo and
+
+1358
+01:05:38,559 --> 01:05:42,480
+then the keyword geo because you need to
+
+1359
+01:05:40,160 --> 01:05:44,559
+find which wildlife pest control to
+
+1360
+01:05:42,480 --> 01:05:46,640
+write to and then you pop that keyword
+
+1361
+01:05:44,559 --> 01:05:48,400
+score here and they should all be very
+
+1362
+01:05:46,640 --> 01:05:52,799
+similar. It should almost look at like
+
+1363
+01:05:48,400 --> 01:05:56,240
+it repeats. If you compare the Riverview
+
+1364
+01:05:52,799 --> 01:05:59,119
+Raccoon to the Port Newport Richie
+
+1365
+01:05:56,240 --> 01:06:00,480
+raccoon, the numbers should repeat, if
+
+1366
+01:05:59,119 --> 01:06:01,839
+that makes sense. It should be like the
+
+1367
+01:06:00,480 --> 01:06:03,280
+exact same thing. If it's working
+
+1368
+01:06:01,839 --> 01:06:05,280
+correctly. If you see it's not working
+
+1369
+01:06:03,280 --> 01:06:06,720
+correctly and they're different, then
+
+1370
+01:06:05,280 --> 01:06:09,119
+you know that there's a problem in what
+
+1371
+01:06:06,720 --> 01:06:11,359
+you did. Um,
+
+1372
+01:06:09,119 --> 01:06:12,640
+so the keyword score one should be
+
+1373
+01:06:11,359 --> 01:06:15,119
+straightforward. You've got the code
+
+1374
+01:06:12,640 --> 01:06:17,520
+inside that chat GPT. Then you need to
+
+1375
+01:06:15,119 --> 01:06:21,440
+make another formula to calculate the
+
+1376
+01:06:17,520 --> 01:06:23,200
+ranking using you can you can use my
+
+1377
+01:06:21,440 --> 01:06:24,480
+code example on the last one and say hey
+
+1378
+01:06:23,200 --> 01:06:27,200
+we need to make a simplified version of
+
+1379
+01:06:24,480 --> 01:06:30,559
+this where we have a scale of 1 to 10
+
+1380
+01:06:27,200 --> 01:06:33,359
+and we need to make uh a decay curve on
+
+1381
+01:06:30,559 --> 01:06:34,960
+that with a kappa as an input and
+
+1382
+01:06:33,359 --> 01:06:37,920
+anything above 10 should be
+
+1383
+01:06:34,960 --> 01:06:39,760
+automatically zero. Um but one through
+
+1384
+01:06:37,920 --> 01:06:41,839
+10 should be graded on this curve. You
+
+1385
+01:06:39,760 --> 01:06:45,200
+know if it's a kappa of one it's linear.
+
+1386
+01:06:41,839 --> 01:06:47,039
+If it's if it's a decay curve that has a
+
+1387
+01:06:45,200 --> 01:06:50,480
+high kappa then it'll look like that
+
+1388
+01:06:47,039 --> 01:06:52,079
+like a scimitar almost right. Um and so
+
+1389
+01:06:50,480 --> 01:06:54,640
+then you can set the kappa from the
+
+1390
+01:06:52,079 --> 01:06:57,680
+sheet which we did in that config. So
+
+1391
+01:06:54,640 --> 01:07:00,319
+you take the config here uh the keyword
+
+1392
+01:06:57,680 --> 01:07:03,760
+ones there's a there's a a keyword um
+
+1393
+01:07:00,319 --> 01:07:06,880
+split or keyword partition split which
+
+1394
+01:07:03,760 --> 01:07:08,880
+is a zero to one. There's a a keyword um
+
+1395
+01:07:06,880 --> 01:07:10,960
+kappa and then there should be a ranking
+
+1396
+01:07:08,880 --> 01:07:12,799
+kappa. And the ranking cap is what you'd
+
+1397
+01:07:10,960 --> 01:07:15,039
+use in the ranking calculation. Again,
+
+1398
+01:07:12,799 --> 01:07:16,720
+you'll notice that those values seem
+
+1399
+01:07:15,039 --> 01:07:18,240
+very similar to all the other ones. All
+
+1400
+01:07:16,720 --> 01:07:19,599
+the ones will have the same value. All
+
+1401
+01:07:18,240 --> 01:07:20,880
+the twos will have the same value. All
+
+1402
+01:07:19,599 --> 01:07:22,640
+the threes will have the same value
+
+1403
+01:07:20,880 --> 01:07:25,839
+because it's a pretty straightforward
+
+1404
+01:07:22,640 --> 01:07:28,960
+calculation, right? Um and then that
+
+1405
+01:07:25,839 --> 01:07:33,280
+final one is the end of the algo, right?
+
+1406
+01:07:28,960 --> 01:07:35,280
+So I think uh I can give you that
+
+1407
+01:07:33,280 --> 01:07:39,359
+formula now for calculating the final
+
+1408
+01:07:35,280 --> 01:07:41,200
+score if you want. Um, it it's mostly
+
+1409
+01:07:39,359 --> 01:07:43,680
+just multiplication of the different
+
+1410
+01:07:41,200 --> 01:07:47,440
+values, right? Take the Riverview
+
+1411
+01:07:43,680 --> 01:07:50,160
+location score times the raccoon removal
+
+1412
+01:07:47,440 --> 01:07:52,000
+niche score times the keyword score
+
+1413
+01:07:50,160 --> 01:07:53,440
+times the ranking score and you get the
+
+1414
+01:07:52,000 --> 01:07:56,000
+final keyword score. You basically
+
+1415
+01:07:53,440 --> 01:07:56,240
+multiply all the components together,
+
+1416
+01:07:56,000 --> 01:07:57,760
+right?
+
+1417
+01:07:56,240 --> 01:08:00,240
+And then it out and then that's your
+
+1418
+01:07:57,760 --> 01:08:04,640
+score, right? Um, and then from there
+
+1419
+01:08:00,240 --> 01:08:07,760
+you've got an extremely atomic view of
+
+1420
+01:08:04,640 --> 01:08:10,240
+what that keyword ranking has worked to
+
+1421
+01:08:07,760 --> 01:08:14,559
+a client. Uh, the only other way to
+
+1422
+01:08:10,240 --> 01:08:17,199
+enrich that would be to bring in uh
+
+1423
+01:08:14,559 --> 01:08:20,799
+perhaps more competition data uh to the
+
+1424
+01:08:17,199 --> 01:08:23,679
+keyword or um value in jobs based off of
+
+1425
+01:08:20,799 --> 01:08:26,159
+it. Right? A raccoon job is an average
+
+1426
+01:08:23,679 --> 01:08:28,480
+value of this. Uh, you know what I mean?
+
+1427
+01:08:26,159 --> 01:08:31,359
+So that's the only other way to to to
+
+1428
+01:08:28,480 --> 01:08:34,480
+add value. Um
+
+1429
+01:08:31,359 --> 01:08:37,040
+which we could bake in as well. Uh
+
+1430
+01:08:34,480 --> 01:08:39,359
+so yeah,
+
+1431
+01:08:37,040 --> 01:08:42,000
+those are that's basically how it works.
+
+1432
+01:08:39,359 --> 01:08:43,759
+Um so
+
+1433
+01:08:42,000 --> 01:08:46,400
+I I want to kind of sum it up a little
+
+1434
+01:08:43,759 --> 01:08:49,120
+bit more in a mind map. Uh the tasks are
+
+1435
+01:08:46,400 --> 01:08:54,960
+to
+
+1436
+01:08:49,120 --> 01:08:57,359
+create a location um score
+
+1437
+01:08:54,960 --> 01:08:59,520
+script.
+
+1438
+01:08:57,359 --> 01:09:02,880
+Create a
+
+1439
+01:08:59,520 --> 01:09:04,960
+niche score script.
+
+1440
+01:09:02,880 --> 01:09:08,719
+Create a
+
+1441
+01:09:04,960 --> 01:09:13,040
+keyword score script.
+
+1442
+01:09:08,719 --> 01:09:16,000
+create a um ranking
+
+1443
+01:09:13,040 --> 01:09:18,239
+score script.
+
+1444
+01:09:16,000 --> 01:09:21,920
+And then finally, you're going to create
+
+1445
+01:09:18,239 --> 01:09:25,679
+a or merge
+
+1446
+01:09:21,920 --> 01:09:29,120
+score scripts
+
+1447
+01:09:25,679 --> 01:09:31,520
+um and factor
+
+1448
+01:09:29,120 --> 01:09:34,319
+uh scores, which is basically going to
+
+1449
+01:09:31,520 --> 01:09:38,319
+be four,
+
+1450
+01:09:34,319 --> 01:09:40,159
+you know. Let's just go back here.
+
+1451
+01:09:38,319 --> 01:09:42,560
+for
+
+1452
+01:09:40,159 --> 01:09:44,880
+wildlife removal as a service in
+
+1453
+01:09:42,560 --> 01:09:47,040
+Riverview for the keyword wildlife pest
+
+1454
+01:09:44,880 --> 01:09:48,960
+control. I'm going to multiply the
+
+1455
+01:09:47,040 --> 01:09:51,440
+keyword score, the ranking modifier
+
+1456
+01:09:48,960 --> 01:09:53,520
+score, the location score, and the niche
+
+1457
+01:09:51,440 --> 01:09:54,880
+score together and get the final score.
+
+1458
+01:09:53,520 --> 01:09:57,280
+You know, it's just multiply, multiply,
+
+1459
+01:09:54,880 --> 01:10:00,159
+multiply, multiply. Um, and then it
+
+1460
+01:09:57,280 --> 01:10:03,760
+should come out to a final score.
+
+1461
+01:10:00,159 --> 01:10:07,840
+Uh and what you'll find is if you were
+
+1462
+01:10:03,760 --> 01:10:11,120
+to have number one rankings across all
+
+1463
+01:10:07,840 --> 01:10:12,800
+terms uh in all markets, if you were to
+
+1464
+01:10:11,120 --> 01:10:15,040
+then add all the final scores together,
+
+1465
+01:10:12,800 --> 01:10:16,400
+they should equal one.
+
+1466
+01:10:15,040 --> 01:10:18,719
+You'll never get that because you're not
+
+1467
+01:10:16,400 --> 01:10:20,640
+getting perfect rankings. But if you
+
+1468
+01:10:18,719 --> 01:10:22,560
+were to have ideal results, they would
+
+1469
+01:10:20,640 --> 01:10:24,400
+average out to one if you added all the
+
+1470
+01:10:22,560 --> 01:10:27,760
+final scores together, if that makes
+
+1471
+01:10:24,400 --> 01:10:31,040
+sense. Um
+
+1472
+01:10:27,760 --> 01:10:31,040
+which would be super cool.
+
+1473
+01:10:31,840 --> 01:10:36,239
+Uh,
+
+1474
+01:10:33,600 --> 01:10:38,239
+so
+
+1475
+01:10:36,239 --> 01:10:39,679
+questions
+
+1476
+01:10:38,239 --> 01:10:42,400
+because this is a lot. I'm kind of
+
+1477
+01:10:39,679 --> 01:10:44,000
+asking you to I I hope I've broken it
+
+1478
+01:10:42,400 --> 01:10:45,760
+down well and I think I solved the
+
+1479
+01:10:44,000 --> 01:10:49,600
+hardest part and given you a script for
+
+1480
+01:10:45,760 --> 01:10:50,960
+it. Um, but I think the keyword part is
+
+1481
+01:10:49,600 --> 01:10:54,560
+going to be hard. I think the the
+
+1482
+01:10:50,960 --> 01:10:56,480
+ranking one will be um
+
+1483
+01:10:54,560 --> 01:10:57,760
+somewhat hard because it's like a weird
+
+1484
+01:10:56,480 --> 01:11:01,440
+calculation but it should be
+
+1485
+01:10:57,760 --> 01:11:03,440
+straightforward too. Uh and you got the
+
+1486
+01:11:01,440 --> 01:11:06,800
+harder version to look at to see you
+
+1487
+01:11:03,440 --> 01:11:10,320
+know to help understand it right. Um so
+
+1488
+01:11:06,800 --> 01:11:12,560
+do you have any questions on it?
+
+1489
+01:11:10,320 --> 01:11:14,800
+Nothing right now. I'll probably have
+
+1490
+01:11:12,560 --> 01:11:15,360
+have to like review this recording.
+
+1491
+01:11:14,800 --> 01:11:17,679
+Yeah. So,
+
+1492
+01:11:15,360 --> 01:11:19,440
+yeah. I expect
+
+1493
+01:11:17,679 --> 01:11:21,679
+review the recording and then, you know,
+
+1494
+01:11:19,440 --> 01:11:24,480
+you can ask me questions over over
+
+1495
+01:11:21,679 --> 01:11:26,400
+Friday, the weekend or whatever. Um, I'd
+
+1496
+01:11:24,480 --> 01:11:29,199
+like to see you writing values to all of
+
+1497
+01:11:26,400 --> 01:11:30,719
+these uh as best you can, right? Um, and
+
+1498
+01:11:29,199 --> 01:11:32,719
+then we can review it kind of Monday.
+
+1499
+01:11:30,719 --> 01:11:36,080
+Probably Tuesday will be the best day to
+
+1500
+01:11:32,719 --> 01:11:37,920
+dive deeper into it because um we got
+
+1501
+01:11:36,080 --> 01:11:42,320
+more time because Monday's got that nine
+
+1502
+01:11:37,920 --> 01:11:45,199
+o'clock. Uh but generally
+
+1503
+01:11:42,320 --> 01:11:48,400
+uh it is somewhat straightforward if you
+
+1504
+01:11:45,199 --> 01:11:50,560
+just think about like take the you know
+
+1505
+01:11:48,400 --> 01:11:51,440
+we've made a new a new sheet so you
+
+1506
+01:11:50,560 --> 01:11:52,400
+don't have to worry about your old
+
+1507
+01:11:51,440 --> 01:11:55,360
+script. You don't have to worry about
+
+1508
+01:11:52,400 --> 01:11:56,880
+integrating with any old code. Um you're
+
+1509
+01:11:55,360 --> 01:11:59,120
+just thinking about writing one script
+
+1510
+01:11:56,880 --> 01:12:00,719
+at a time and dropping the values in and
+
+1511
+01:11:59,120 --> 01:12:03,600
+then adding to it. Okay, now that we've
+
+1512
+01:12:00,719 --> 01:12:05,520
+written the location one, that location
+
+1513
+01:12:03,600 --> 01:12:06,800
+score is still in memory. we've written
+
+1514
+01:12:05,520 --> 01:12:09,199
+it, but now we're going to focus on
+
+1515
+01:12:06,800 --> 01:12:11,360
+writing the niche ones. And then as you
+
+1516
+01:12:09,199 --> 01:12:12,719
+build that script over time, when you
+
+1517
+01:12:11,360 --> 01:12:14,400
+hit the run button, you should be
+
+1518
+01:12:12,719 --> 01:12:16,320
+writing the locations every time and
+
+1519
+01:12:14,400 --> 01:12:18,000
+then the niche every time. And it it
+
+1520
+01:12:16,320 --> 01:12:20,960
+just starts to expand, if that makes
+
+1521
+01:12:18,000 --> 01:12:22,880
+sense. So you go bang bang bang bang
+
+1522
+01:12:20,960 --> 01:12:24,400
+bang bang. And then eventually once
+
+1523
+01:12:22,880 --> 01:12:27,040
+you've done all the keyword and all the
+
+1524
+01:12:24,400 --> 01:12:31,920
+ranking score ones, then the last one is
+
+1525
+01:12:27,040 --> 01:12:34,640
+just go into uh this guy's row, right?
+
+1526
+01:12:31,920 --> 01:12:36,080
+um go for each of these keywords and
+
+1527
+01:12:34,640 --> 01:12:37,199
+calculate the value and put it in.
+
+1528
+01:12:36,080 --> 01:12:38,960
+Calculate the value, put it in,
+
+1529
+01:12:37,199 --> 01:12:42,320
+calculate the value, put it in. That
+
+1530
+01:12:38,960 --> 01:12:46,560
+type of a thing. I'd say avoid at all
+
+1531
+01:12:42,320 --> 01:12:49,120
+cost the need to go reference data from
+
+1532
+01:12:46,560 --> 01:12:52,000
+the script except for at the beginning,
+
+1533
+01:12:49,120 --> 01:12:53,760
+if that makes sense. Um I would load in
+
+1534
+01:12:52,000 --> 01:12:56,560
+at the beginning of the script the
+
+1535
+01:12:53,760 --> 01:12:58,159
+keyword ranking data. Uh basically all
+
+1536
+01:12:56,560 --> 01:13:02,640
+the objects, right? Like you could you
+
+1537
+01:12:58,159 --> 01:13:04,719
+could say um I'm going to
+
+1538
+01:13:02,640 --> 01:13:07,920
+uh pull in my location stuff. I'm going
+
+1539
+01:13:04,719 --> 01:13:10,880
+to pull in my um niche stuff. I'm going
+
+1540
+01:13:07,920 --> 01:13:14,640
+to pull in my keyword rankings. Uh and
+
+1541
+01:13:10,880 --> 01:13:16,960
+then though I'm writing data out, I'm
+
+1542
+01:13:14,640 --> 01:13:18,480
+not ever having to go reference that
+
+1543
+01:13:16,960 --> 01:13:20,960
+written data again to continue my
+
+1544
+01:13:18,480 --> 01:13:24,320
+operation. I'm only writing it out as a
+
+1545
+01:13:20,960 --> 01:13:26,960
+log, right? And that's just so we can
+
+1546
+01:13:24,320 --> 01:13:29,199
+audit it later. Uh, and then that'll
+
+1547
+01:13:26,960 --> 01:13:33,600
+make it easy for us to tell if the the
+
+1548
+01:13:29,199 --> 01:13:34,719
+map does indeed map. Uh, and then if you
+
+1549
+01:13:33,600 --> 01:13:37,040
+if you just kind of follow that
+
+1550
+01:13:34,719 --> 01:13:38,880
+trajectory, you can do keyword last and
+
+1551
+01:13:37,040 --> 01:13:40,080
+do ranking before it, like the actual
+
+1552
+01:13:38,880 --> 01:13:41,440
+ranking score, because that should be
+
+1553
+01:13:40,080 --> 01:13:43,920
+simpler. And then keyword will be the
+
+1554
+01:13:41,440 --> 01:13:46,960
+most complex one. And then at the end,
+
+1555
+01:13:43,920 --> 01:13:49,360
+as long as your your rows match, um, you
+
+1556
+01:13:46,960 --> 01:13:51,040
+should be able to, uh, do the
+
+1557
+01:13:49,360 --> 01:13:53,040
+multiplication very easily, I would
+
+1558
+01:13:51,040 --> 01:13:55,040
+think. Uh, it kind of depends on how you
+
+1559
+01:13:53,040 --> 01:13:57,760
+want to organize your objects, but I
+
+1560
+01:13:55,040 --> 01:14:00,239
+leave that up to you. Um, if you feel
+
+1561
+01:13:57,760 --> 01:14:01,760
+like you can't hack it or whatever and
+
+1562
+01:14:00,239 --> 01:14:03,679
+you're just like, I tried and it totally
+
+1563
+01:14:01,760 --> 01:14:05,040
+screwed up, we obviously know enough
+
+1564
+01:14:03,679 --> 01:14:06,960
+about the problem that I could we could
+
+1565
+01:14:05,040 --> 01:14:09,120
+build the script on the next call and
+
+1566
+01:14:06,960 --> 01:14:10,400
+just try it that way. Um, but I want to
+
+1567
+01:14:09,120 --> 01:14:13,199
+make sure you struggle with it first
+
+1568
+01:14:10,400 --> 01:14:16,800
+because I think that's useful to to
+
+1569
+01:14:13,199 --> 01:14:18,400
+development. So, um, cool. You got the
+
+1570
+01:14:16,800 --> 01:14:22,080
+you got the chat. So, there's the code
+
+1571
+01:14:18,400 --> 01:14:25,320
+in there. Um, yeah. Right on. Good luck
+
+1572
+01:14:22,080 --> 01:14:25,320
+to you.
+
+1573
+01:14:25,920 --> 01:14:29,840
+Um, yeah, don't forget to send me the
+
+1574
+01:14:28,239 --> 01:14:31,600
+recording, Gordon.
+
+1575
+01:14:29,840 --> 01:14:33,360
+Yeah. Yeah. Uh, if you don't see it,
+
+1576
+01:14:31,600 --> 01:14:36,080
+remind me just because, uh, that's taken
+
+1577
+01:14:33,360 --> 01:14:38,960
+a while to process long recordings. So,
+
+1578
+01:14:36,080 --> 01:14:41,120
+yeah, I'll send you a message.
+
+1579
+01:14:38,960 --> 01:14:43,120
+Sounds good. I'll see you later.
+
+1580
+01:14:41,120 --> 01:14:46,679
+See you later, Gordon. Have a good one.
+
+1581
+01:14:43,120 --> 01:14:46,679
+You, too. Byebye.
+
