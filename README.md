@@ -6,9 +6,9 @@ A modular Google Apps Script scoring system that quantifies the value of local S
 
 This system calculates normalized scores across multiple dimensions to identify keyword opportunities across markets. Each scoring component is normalized independently and combined multiplicatively to produce a final normalized value.
 
-## Key Discovery: Keyword Scoring Implementation
+## Key Discoveries: Implementation Fixes
 
-### The Problem We Found
+### Discovery 1: Keyword Scoring Implementation
 
 **Initial Implementation (INCORRECT):**
 - Applied a logarithmic decay curve based on keyword position in the Keyword sheet
@@ -21,7 +21,7 @@ This system calculates normalized scores across multiple dimensions to identify 
 - All core keywords get equal share of `partitionSplit`
 - All geo keywords get equal share of `(1 - partitionSplit)`
 
-### Why This Matters
+**Why This Matters:**
 
 From the transcript: *"take an average so that you get the chunk and then you just say we got five keywords, they're all worth oneif of whatever that first partition is worth"*
 
@@ -31,14 +31,41 @@ This approach is:
 - Keeps keyword scores "brain dead" - simple and auditable
 - Ensures keywords have the same score regardless of location (location is factored separately)
 
+### Discovery 2: Ranking Modifier Score Normalization
+
+**The Problem:**
+- Ranking modifier scores were being normalized (sum = 1)
+- This turned rank 1 from 1.0 into ~0.0347
+- Client requirement: rank 1 should be 1.0
+
+**Why This Matters:**
+- Ranking modifier acts as a **performance multiplier** in the final score calculation
+- If rank 1 = 0.0347 instead of 1.0, it unfairly penalizes rank 1 performance
+- Rank 1 should preserve full value (multiply by 1.0), not be penalized
+
+**The Fix:**
+- Removed normalization from ranking modifier scores
+- Now using raw decay curve values directly (no normalization)
+- Rank 1 = 1.0 (no penalty, preserves full value)
+- Rank 2 = exp(-kappa × 1) (small multiplier)
+- Rank 3 = exp(-kappa × 2) (smaller multiplier)
+- Ranks 4-10 = continue decaying (very small but visible)
+- Ranks > 10 = 0 (as expected)
+
+**Result:**
+- Rank 1 correctly multiplies by 1.0 (preserves full value)
+- Lower ranks get appropriate decay multipliers
+- Decay curve steepness controlled by `rank modification kappa` in Config
+- Ranking modifier is now a true performance multiplier, not a normalized score
+
 ## Project Structure
 
 ### Scripts
 
 1. **LocationScore.gs** - Calculates market potential using population and income data
 2. **NicheScore.gs** - Normalizes Keyword Planner service values
-3. **KeywordScore.gs** - Assigns keyword scores (core vs geo buckets with equal distribution) ⚠️ **NEEDS FIX**
-4. **RankingScore.gs** - Applies exponential decay to ranking positions (ranks 1-10)
+3. **KeywordScore.gs** - Assigns keyword scores (core vs geo buckets with equal distribution) ✅ **FIXED**
+4. **RankingScore.gs** - Applies exponential decay to ranking positions (ranks 1-10, raw scores as multipliers) ✅ **FIXED**
 5. **FinalMerge.gs** - Multiplies all normalized scores and re-normalizes
 
 ### Sheets
@@ -59,7 +86,7 @@ This approach is:
    - Identify core vs geo keywords
    - Core keywords: equal share of `partitionSplit`
    - Geo keywords: equal share of `(1 - partitionSplit)`
-4. **Ranking Score**: `exp(-kappa × (rank - 1))` for ranks 1-10, else 0 → normalized
+4. **Ranking Score**: `exp(-kappa × (rank - 1))` for ranks 1-10, else 0 → **raw scores (no normalization, acts as multiplier)**
 5. **Final Score**: `location × niche × keyword × ranking` → re-normalized
 
 ## Configuration
@@ -82,9 +109,11 @@ This approach is:
 
 ## Current Status
 
-⚠️ **Keyword scoring needs to be fixed** - Currently uses decay curve instead of flat/equal distribution.
+✅ **Keyword scoring fixed** - Now uses flat/equal distribution within core and geo buckets.
 
-See `docs/rank_score_calculator_plan.md` for implementation details.
+✅ **Ranking modifier score fixed** - Now uses raw decay scores (no normalization) so rank 1 = 1.0 as multiplier.
+
+See `docs/rank_score_calculator_plan.md` and `docs/keyword_scoring_fix_plan.md` for implementation details.
 
 ## References
 

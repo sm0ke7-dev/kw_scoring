@@ -9,7 +9,8 @@ function runRankingScore() {
   if (idxRank === -1) throw new Error('Rankings sheet missing Ranking Position header');
   const kappa = Number(cfg.rankModificationKappa) || 10;
 
-  const raw = [];
+  // Calculate raw decay scores (no normalization - rank 1 should be 1.0 as multiplier)
+  const scores = [];
   for (let r = 1; r < values.length; r++) {
     const row = values[r];
     const rank = Number(row[idxRank]) || 0;
@@ -17,13 +18,14 @@ function runRankingScore() {
     if (rank >= 1 && rank <= 10) {
       score = Math.exp(-kappa * (rank - 1));
     } else {
-      score = 0;
+      score = 0; // Ranks > 10 get zero
     }
-    raw.push(score);
+    scores.push(score);
   }
-  const normalized = normalizeVector(raw);
-  logSumCheck('Ranking normalized', normalized);
-  writeColumnByHeader(sheet, 'ranking modifier score', normalized);
+  // Log check: rank 1 should be 1.0 (or close to it)
+  const rank1Count = scores.filter(s => s === 1.0 || Math.abs(s - 1.0) < 0.0001).length;
+  console.log('Ranking modifier scores: rank 1 = 1.0 (count: ' + rank1Count + '), raw scores (no normalization)');
+  writeColumnByHeader(sheet, 'ranking modifier score', scores);
 }
 
 
