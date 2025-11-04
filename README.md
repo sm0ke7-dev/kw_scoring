@@ -58,6 +58,29 @@ This approach is:
 - Decay curve steepness controlled by `rank modification kappa` in Config
 - Ranking modifier is now a true performance multiplier, not a normalized score
 
+### Discovery 3: Niche Score Join Issue
+
+**The Problem:**
+- Final scores were all zero because `niche_score` was zero
+- Diagnostic logging revealed: Niche sheet had "raccoon", "squirrel", "bat"
+- Rankings sheet was looking for "wildlife removal"
+- Join failed because service values didn't match
+
+**Why This Matters:**
+- The final score calculation is multiplicative: `final_raw = location × niche × keyword × ranking`
+- If any component is zero, the final score becomes zero
+- Service names must match exactly (case-insensitive, trimmed) between Niche and Rankings sheets
+
+**The Fix:**
+- Added "wildlife removal" service to Niche sheet with Keyword Planner Score
+- Re-ran Niche Score script to recalculate normalized scores
+- Now Niche sheet contains all services that appear in Rankings sheet
+
+**Result:**
+- Niche scores now properly match between Niche and Rankings sheets
+- Final scores calculated correctly with all components non-zero
+- Diagnostic logging added to FinalMerge to help identify future join issues
+
 ## Project Structure
 
 ### Scripts
@@ -112,6 +135,8 @@ This approach is:
 ✅ **Keyword scoring fixed** - Now uses flat/equal distribution within core and geo buckets.
 
 ✅ **Ranking modifier score fixed** - Now uses raw decay scores (no normalization) so rank 1 = 1.0 as multiplier.
+
+✅ **Niche score join fixed** - Added diagnostic logging and identified service name mismatch between Niche and Rankings sheets.
 
 See `docs/rank_score_calculator_plan.md` and `docs/keyword_scoring_fix_plan.md` for implementation details.
 

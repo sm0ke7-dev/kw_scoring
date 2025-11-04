@@ -10,6 +10,7 @@ function onOpen() {
     .addItem('Final Merge', 'runFinalMerge')
     .addSeparator()
     .addItem('Plot Decay Curve', 'plotDecayCurve')
+    .addItem('Visualize Final Scores', 'visualizeFinalScores')
     .addSeparator()
     .addItem('Clear Log', 'clearLog')
     .addToUi();

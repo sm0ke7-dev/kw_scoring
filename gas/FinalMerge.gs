@@ -41,6 +41,15 @@ function runFinalMerge() {
     const row = nValues[r];
     nicheMap.set(normalizeKey(row[idxNService]), Number(row[idxNNorm]) || 0);
   }
+  
+  // Diagnostic: log niche map contents
+  console.log('Debug - Niche Map:');
+  console.log('  Total entries: ' + nicheMap.size);
+  const nicheKeys = Array.from(nicheMap.keys());
+  console.log('  First 3 service keys in Niche sheet:');
+  for (let i = 0; i < Math.min(3, nicheKeys.length); i++) {
+    console.log('    "' + nicheKeys[i] + '" = ' + nicheMap.get(nicheKeys[i]));
+  }
 
   const keywordSheet = getSheet('Keyword');
   const kValues = getDataRangeValues(keywordSheet);
@@ -84,6 +93,7 @@ function runFinalMerge() {
   const finalRaw = [];
   const rankingKeywordScores = [];
   const rankingFinalScores = [];
+  const sampleLookups = []; // For diagnostic logging
   for (let r = 1; r < rValues.length; r++) {
     const row = rValues[r];
     const service = row[idxService];
@@ -91,7 +101,18 @@ function runFinalMerge() {
     const keyword = row[idxKeyword];
     const kwPlusGeo = idxKwGeo !== -1 ? row[idxKwGeo] : '';
     const locationScore = locMap.get(normalizeKey(geo)) || 0;
-    const nicheScore = nicheMap.get(normalizeKey(service)) || 0;
+    const serviceNorm = normalizeKey(service);
+    const nicheScore = nicheMap.get(serviceNorm) || 0;
+    
+    // Diagnostic: collect first 3 lookups
+    if (sampleLookups.length < 3) {
+      sampleLookups.push({
+        raw: String(service || ''),
+        normalized: serviceNorm,
+        found: nicheMap.has(serviceNorm),
+        score: nicheScore
+      });
+    }
     const useGeo = isGeoString(kwPlusGeo);
     const kKey = normalizeKey(keyword);
     const keywordScore = useGeo ? (keywordGeoMap.get(kKey) || 0) : (keywordCoreMap.get(kKey) || 0);
@@ -113,6 +134,18 @@ function runFinalMerge() {
       0 // placeholder for final_normalized
     ]);
   }
+  
+  // Diagnostic: log sample lookups
+  console.log('Debug - Sample Niche Lookups from Rankings:');
+  for (let i = 0; i < sampleLookups.length; i++) {
+    const lookup = sampleLookups[i];
+    console.log('  Row ' + (i + 1) + ':');
+    console.log('    Raw service: "' + lookup.raw + '"');
+    console.log('    Normalized: "' + lookup.normalized + '"');
+    console.log('    Found in map: ' + (lookup.found ? 'YES' : 'NO'));
+    console.log('    Niche score: ' + lookup.score);
+  }
+  
   const finalNorm = normalizeVector(finalRaw);
   logSumCheck('Final normalized', finalNorm);
   for (let i = 0; i < outRows.length; i++) outRows[i][8] = finalNorm[i];
@@ -140,6 +173,118 @@ function runFinalMerge() {
     } catch (e) {
       // ignore styling errors
     }
+  }
+}
+
+/**
+ * Visualize final scores - shows top keywords by final_normalized value
+ * Creates sortable data for charting most important keywords to target
+ */
+function visualizeFinalScores() {
+  const ss = getSpreadsheet();
+  const finalSheet = getSheet('Final');
+  const values = getDataRangeValues(finalSheet);
+  if (values.length < 2) {
+    console.log('No Final data to visualize. Run Final Merge first.');
+    return;
+  }
+
+  const header = values[0].map(h => String(h));
+  const normHeader = header.map(h => normalizeKey(h));
+  
+  const idxService = normHeader.indexOf('service');
+  const idxGeo = normHeader.indexOf('geo');
+  const idxKeyword = normHeader.indexOf('keyword');
+  const idxFinalNorm = normHeader.indexOf('final_normalized');
+  
+  if ([idxService, idxGeo, idxKeyword, idxFinalNorm].some(i => i === -1)) {
+    throw new Error('Final sheet missing required columns');
+  }
+
+  // Build array of rows with final_normalized scores
+  const rows = [];
+  for (let r = 1; r < values.length; r++) {
+    const row = values[r];
+    const service = String(row[idxService] || '');
+    const geo = String(row[idxGeo] || '');
+    const keyword = String(row[idxKeyword] || '');
+    const finalNorm = Number(row[idxFinalNorm]) || 0;
+    
+    if (service || geo || keyword) {
+      rows.push({
+        service: service,
+        geo: geo,
+        keyword: keyword,
+        final_normalized: finalNorm,
+        label: service + ' | ' + geo + ' | ' + keyword
+      });
+    }
+  }
+
+  // Sort by final_normalized (descending)
+  rows.sort((a, b) => b.final_normalized - a.final_normalized);
+
+  // Write visualization columns to Final sheet
+  const positions = [];
+  const scores = [];
+  const labels = [];
+  
+  for (let i = 0; i < rows.length; i++) {
+    positions.push(i + 1);
+    scores.push(rows[i].final_normalized);
+    labels.push(rows[i].label);
+  }
+
+  // Create or get visualization sheet
+  let vizSheet = ss.getSheetByName('Final Visualization');
+  if (!vizSheet) {
+    vizSheet = ss.insertSheet('Final Visualization');
+  } else {
+    vizSheet.clearContents();
+  }
+  
+  // Write visualization data to new sheet
+  const vizHeader = ['Position', 'Final Score', 'Service | Geo | Keyword'];
+  vizSheet.getRange(1, 1, 1, 3).setValues([vizHeader]);
+  
+  const vizData = [];
+  for (let i = 0; i < rows.length; i++) {
+    vizData.push([positions[i], scores[i], labels[i]]);
+  }
+  
+  if (vizData.length > 0) {
+    vizSheet.getRange(2, 1, vizData.length, 3).setValues(vizData);
+    
+    // Format header
+    vizSheet.getRange(1, 1, 1, 3).setFontWeight('bold').setBackground('#E8F0FE');
+    
+    // Automatically create a chart on the visualization sheet
+    try {
+      const numRows = Math.min(rows.length, 100); // Limit to top 100 for readability
+      const chartRange = vizSheet.getRange(1, 1, numRows + 1, 2); // Position and score columns
+      
+      const chartBuilder = vizSheet.newChart()
+        .setChartType(Charts.ChartType.LINE)
+        .addRange(chartRange)
+        .setPosition(2, 5, 0, 0) // Position chart next to data
+        .setOption('title', 'Top Keywords by Final Score (Most Important to Target)')
+        .setOption('hAxis.title', 'Position (Rank)')
+        .setOption('vAxis.title', 'Final Normalized Score')
+        .setOption('legend.position', 'none')
+        .setOption('pointSize', 3)
+        .setOption('lineWidth', 2)
+        .setOption('curveType', 'function'); // Smooth curve
+      
+      vizSheet.insertChart(chartBuilder.build());
+      console.log('Chart created on Final Visualization sheet');
+    } catch (e) {
+      console.warn('Could not create chart automatically:', e.message);
+    }
+  }
+  
+  console.log('Top 5 keywords to target:');
+  for (let i = 0; i < Math.min(5, rows.length); i++) {
+    console.log((i + 1) + '. ' + rows[i].label + ' = ' + rows[i].final_normalized.toFixed(6));
   }
 }
 
