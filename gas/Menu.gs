@@ -9,6 +9,8 @@ function onOpen() {
     .addItem('Ranking Score', 'runRankingScore')
     .addItem('Final Merge', 'runFinalMerge')
     .addSeparator()
+    .addItem('Plot Decay Curve', 'plotDecayCurve')
+    .addSeparator()
     .addItem('Clear Log', 'clearLog')
     .addToUi();
 }

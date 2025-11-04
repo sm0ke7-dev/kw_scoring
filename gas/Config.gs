@@ -76,5 +76,3 @@ function getSpreadsheet() {
   if (!id) throw new Error('Missing spreadsheetId. Set Config!Config!spreadsheet_id or Script Property SPREADSHEET_ID.');
   return SpreadsheetApp.openById(id);
 }
-
-
