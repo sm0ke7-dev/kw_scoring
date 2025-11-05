@@ -140,6 +140,17 @@ This approach is:
 
 See `docs/rank_score_calculator_plan.md` and `docs/keyword_scoring_fix_plan.md` for implementation details.
 
+## Per‑Service Core Decay (optional)
+
+An alternative keyword scoring variant is available in `gas/KeywordScore1.gs`:
+
+- Split the core budget (`partition split`) across services using weights from `Niche!Normalization` (falls back to equal per service if all weights are zero/missing).
+- Within each service group, apply the logarithmic decay controlled by `kappa` to that service’s core keywords (order as listed on the `Keyword` sheet).
+- Geo budget is unchanged: equal‑share across unique geo keywords globally.
+- Outputs remain the same columns: `keyword core score`, `keyword geo score`.
+
+To use this variant, wire your menu to call `runKeywordScore` from `KeywordScore1.gs` instead of `KeywordScore.gs`.
+
 ## References
 
 - Project Brief: `rank_score_calculator_brief.md`

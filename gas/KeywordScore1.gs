@@ -6,15 +6,23 @@ function runKeywordScore() {
   const keywordHeader = keywordValues[0].map(h => String(h));
   const keywordNormHeader = keywordHeader.map(h => normalizeKey(h));
   const idxKeywords = keywordNormHeader.indexOf('keywords');
+  const idxServiceCol = (function() {
+    const a = keywordNormHeader.indexOf('services');
+    const b = keywordNormHeader.indexOf('service');
+    return a !== -1 ? a : b;
+  })();
   if (idxKeywords === -1) throw new Error('Keyword sheet missing Keywords header');
 
-  // Read all keywords from Keyword sheet
+  // Read all keywords (and services) from Keyword sheet
   const keywords = [];
+  const services = [];
   for (let r = 1; r < keywordValues.length; r++) {
     const row = keywordValues[r];
     const kw = row[idxKeywords];
     if (kw !== '' && kw !== null) keywords.push(String(kw));
     else keywords.push('');
+    const svc = idxServiceCol !== -1 ? row[idxServiceCol] : '';
+    services.push(String(svc || ''));
   }
   const n = keywords.length;
   if (n === 0) return;
@@ -71,54 +79,92 @@ function runKeywordScore() {
   const kappa = Number(cfg.kappa) || 1;
 
   // Build score arrays
-  // Each keyword gets BOTH core and geo scores (FinalMerge will pick which one to use based on kw+geo)
-  const coreScores = [];
-  const geoScores = [];
-  // Compute decay weights among core keywords in the order they appear on the Keyword sheet
-  const coreKeywordIndices = [];
-  for (let i = 0; i < keywords.length; i++) {
+  const coreScores = new Array(n).fill(0);
+  const geoScores = new Array(n).fill(0);
+
+  // Read Niche normalization per service and compute service-level weights
+  const nicheSheet = getSheet('Niche');
+  const nValues = getDataRangeValues(nicheSheet);
+  const nHeader = nValues[0].map(String);
+  const nNorm = nHeader.map(h => normalizeKey(h));
+  const idxNService = nNorm.indexOf('service');
+  const idxNNorm = nNorm.indexOf('normalization');
+  if (idxNService === -1 || idxNNorm === -1) throw new Error('Niche sheet missing Service/Normalization');
+  const nicheMap = new Map();
+  for (let r = 1; r < nValues.length; r++) {
+    const row = nValues[r];
+    const key = normalizeKey(row[idxNService]);
+    const val = Number(row[idxNNorm]) || 0;
+    if (key) nicheMap.set(key, val);
+  }
+
+  // Collect distinct services present in Keyword sheet
+  const serviceList = [];
+  const seen = new Set();
+  for (let i = 0; i < services.length; i++) {
+    const s = normalizeKey(services[i] || '');
+    if (!s) continue;
+    if (!seen.has(s)) {
+      seen.add(s);
+      serviceList.push(s);
+    }
+  }
+
+  // Build service weights from Niche normalization; fallback to equal if all zero
+  const weights = [];
+  for (let i = 0; i < serviceList.length; i++) {
+    const w = Number(nicheMap.get(serviceList[i])) || 0;
+    weights.push(w);
+  }
+  let sumW = weights.reduce((a,b)=>a+b,0);
+  if (sumW <= 0 && serviceList.length > 0) {
+    // fallback: equal weights
+    for (let i = 0; i < weights.length; i++) weights[i] = 1;
+    sumW = weights.length;
+  }
+
+  // Assign core scores per service with decay inside each service group
+  for (let si = 0; si < serviceList.length; si++) {
+    const serviceKey = serviceList[si];
+    const serviceCoreBudget = sumW > 0 ? coreBudget * (weights[si] / sumW) : 0;
+
+    // indices for this service that are core keywords
+    const indices = [];
+    for (let i = 0; i < n; i++) {
+      if (normalizeKey(services[i] || '') !== serviceKey) continue;
+      const kw = keywords[i];
+      if (!kw) continue;
+      const k = normalizeKey(kw);
+      if (coreKeywordSet.has(k)) indices.push(i);
+    }
+
+    const m = indices.length;
+    if (m === 0 || serviceCoreBudget === 0) continue;
+    // decay weights within this service
+    let wSum = 0;
+    const wArr = [];
+    for (let j = 0; j < m; j++) {
+      const x = ((j + 1) / (m + 1)) * partitionSplit; // sample in [0, split]
+      const w = 1 - Math.log(1 + kappa * x) / Math.log(1 + kappa);
+      wArr.push(w);
+      wSum += w;
+    }
+    if (wSum > 0) {
+      for (let j = 0; j < m; j++) {
+        const idx = indices[j];
+        coreScores[idx] = serviceCoreBudget * (wArr[j] / wSum);
+      }
+    }
+  }
+
+  // Geo equal-share per unique geo keyword (global)
+  const geoCount = geoKeywordSet.size;
+  const geoPer = geoCount > 0 ? geoBudget / geoCount : 0;
+  for (let i = 0; i < n; i++) {
     const kw = keywords[i];
     if (!kw) continue;
     const k = normalizeKey(kw);
-    if (coreKeywordSet.has(k)) coreKeywordIndices.push(i);
-  }
-
-  const Nc = coreKeywordIndices.length;
-  let coreWeights = [];
-  let sumCoreWeights = 0;
-  if (Nc > 0) {
-    for (let i = 0; i < Nc; i++) {
-      const x = ((i + 1) / (Nc + 1)) * partitionSplit; // sample in [0, split]
-      const w = 1 - Math.log(1 + kappa * x) / Math.log(1 + kappa);
-      coreWeights.push(w);
-      sumCoreWeights += w;
-    }
-  }
-
-  // Geo equal-share per unique geo keyword
-  const geoCount = geoKeywordSet.size;
-  const geoPer = geoCount > 0 ? geoBudget / geoCount : 0;
-
-  for (let i = 0; i < keywords.length; i++) {
-    const kw = keywords[i];
-    if (!kw) {
-      coreScores.push(0);
-      geoScores.push(0);
-      continue;
-    }
-    const kwNorm = normalizeKey(kw);
-    const isCore = coreKeywordSet.has(kwNorm);
-    const isGeo = geoKeywordSet.has(kwNorm);
-
-    if (isCore && Nc > 0 && sumCoreWeights > 0) {
-      const rankIndex = coreKeywordIndices.indexOf(i);
-      const weight = coreWeights[rankIndex] || 0;
-      coreScores.push(coreBudget * (weight / sumCoreWeights));
-    } else {
-      coreScores.push(0);
-    }
-
-    geoScores.push(isGeo ? geoPer : 0);
+    if (geoKeywordSet.has(k)) geoScores[i] = geoPer;
   }
 
   logSumCheck('Keyword core normalized', coreScores);
