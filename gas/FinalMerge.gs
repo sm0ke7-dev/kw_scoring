@@ -10,7 +10,7 @@ function runFinalMerge() {
   const idxGeo = rNorm.indexOf('geo');
   const idxKeyword = rNorm.indexOf('keyword');
   const idxKwGeo = rNorm.indexOf('kw+geo');
-  const idxRankMod = rNorm.indexOf('ranking modifier score');
+  const idxRankMod = rNorm.indexOf('rank score');
   if ([idxService, idxGeo, idxKeyword].some(i => i === -1)) {
     throw new Error('Rankings sheet missing service/geo/keyword headers');
   }
@@ -58,15 +58,15 @@ function runFinalMerge() {
   const idxKKeyword = kNorm.indexOf('keywords');
   const idxKCore = kNorm.indexOf('keyword core score');
   const idxKGeo = kNorm.indexOf('keyword geo score');
-  const idxKLegacy = kNorm.indexOf('keyword score');
   if (idxKKeyword === -1) throw new Error('Keyword sheet missing Keywords');
+  if (idxKCore === -1 || idxKGeo === -1) throw new Error('Keyword sheet missing "keyword core score" and/or "keyword geo score" headers');
   const keywordCoreMap = new Map();
   const keywordGeoMap = new Map();
   for (let r = 1; r < kValues.length; r++) {
     const row = kValues[r];
     const key = normalizeKey(row[idxKKeyword]);
-    const coreVal = idxKCore !== -1 ? (Number(row[idxKCore]) || 0) : (idxKLegacy !== -1 ? (Number(row[idxKLegacy]) || 0) : 0);
-    const geoVal = idxKGeo !== -1 ? (Number(row[idxKGeo]) || 0) : (idxKLegacy !== -1 ? (Number(row[idxKLegacy]) || 0) : 0);
+    const coreVal = Number(row[idxKCore]) || 0;
+    const geoVal = Number(row[idxKGeo]) || 0;
     keywordCoreMap.set(key, coreVal);
     keywordGeoMap.set(key, geoVal);
   }
@@ -115,7 +115,22 @@ function runFinalMerge() {
     }
     const useGeo = isGeoString(kwPlusGeo);
     const kKey = normalizeKey(keyword);
-    const keywordScore = useGeo ? (keywordGeoMap.get(kKey) || 0) : (keywordCoreMap.get(kKey) || 0);
+    let keywordScore = 0;
+    if (useGeo) {
+      if (!keywordGeoMap.has(kKey)) {
+        console.warn('Keyword geo score missing for "' + String(keyword || '') + '"; defaulting to 0');
+        keywordScore = 0;
+      } else {
+        keywordScore = Number(keywordGeoMap.get(kKey)) || 0;
+      }
+    } else {
+      if (!keywordCoreMap.has(kKey)) {
+        console.warn('Keyword core score missing for "' + String(keyword || '') + '"; defaulting to 0');
+        keywordScore = 0;
+      } else {
+        keywordScore = Number(keywordCoreMap.get(kKey)) || 0;
+      }
+    }
     const rankingScore = idxRankMod !== -1 ? (Number(row[idxRankMod]) || 0) : 0;
     // For Rankings tab audit columns
     rankingKeywordScores.push(keywordScore);
