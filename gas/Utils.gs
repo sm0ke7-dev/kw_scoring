@@ -1,7 +1,7 @@
 /** Utilities for sheet IO, normalization, joins, and logging */
 
 // Light highlight for computed output columns
-var OUTPUT_BG_COLOR = '#FFF2CC'; // pale yellow
+var OUTPUT_BG_COLOR = '#C6EFCE'; // light green
 
 function getSheet(name) {
   const ss = getSpreadsheet();

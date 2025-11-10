@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../keyword-curve/keyword-score"
+		},
+		{
+			"path": "../../keyword-curve/rank-score"
+		}
+	],
+	"settings": {}
+}
