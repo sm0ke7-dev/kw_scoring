@@ -57,18 +57,53 @@ function runFinalMerge() {
   const kNorm = kHeader.map(h => normalizeKey(h));
   const idxKKeyword = kNorm.indexOf('keywords');
   const idxKCore = kNorm.indexOf('keyword core score');
-  const idxKGeo = kNorm.indexOf('keyword geo score');
   if (idxKKeyword === -1) throw new Error('Keyword sheet missing Keywords');
-  if (idxKCore === -1 || idxKGeo === -1) throw new Error('Keyword sheet missing "keyword core score" and/or "keyword geo score" headers');
+  if (idxKCore === -1) throw new Error('Keyword sheet missing "keyword core score" header');
   const keywordCoreMap = new Map();
-  const keywordGeoMap = new Map();
   for (let r = 1; r < kValues.length; r++) {
     const row = kValues[r];
     const key = normalizeKey(row[idxKKeyword]);
     const coreVal = Number(row[idxKCore]) || 0;
-    const geoVal = Number(row[idxKGeo]) || 0;
     keywordCoreMap.set(key, coreVal);
-    keywordGeoMap.set(key, geoVal);
+  }
+
+  // Pre-calculate geo scores per location-service combination (0.34 divided by unique kw+geo count per location-service)
+  const cfg = getConfig();
+  const geoBudget = 1 - (Number(cfg.partitionSplit) || 0.66);
+  const locationServiceGeoScoreMap = new Map(); // "location|service" -> geo score per keyword
+  
+  // Group Rankings rows by location AND service, count unique kw+geo per location-service combination
+  const locationServiceKwGeoMap = new Map(); // "location|service" -> Set of unique kw+geo values
+  for (let r = 1; r < rValues.length; r++) {
+    const row = rValues[r];
+    const geo = String(row[idxGeo] || '').trim();
+    const service = String(row[idxService] || '').trim();
+    const kwPlusGeo = idxKwGeo !== -1 ? String(row[idxKwGeo] || '').trim() : '';
+    if (!geo || !service || !kwPlusGeo) continue;
+    
+    const geoNorm = normalizeKey(geo);
+    const serviceNorm = normalizeKey(service);
+    const kwGeoNorm = normalizeKey(kwPlusGeo);
+    
+    // Only count if this is a geo keyword (kw+geo doesn't match base keyword)
+    const keyword = String(row[idxKeyword] || '').trim();
+    if (keyword && normalizeKey(keyword) === kwGeoNorm) continue; // Skip core keywords
+    
+    // Use composite key: location|service
+    const compositeKey = geoNorm + '|' + serviceNorm;
+    if (!locationServiceKwGeoMap.has(compositeKey)) {
+      locationServiceKwGeoMap.set(compositeKey, new Set());
+    }
+    locationServiceKwGeoMap.get(compositeKey).add(kwGeoNorm);
+  }
+  
+  // Calculate geo score per location-service: 0.34 / unique kw+geo count for this location-service combination
+  for (const [compositeKey, kwGeoSet] of locationServiceKwGeoMap.entries()) {
+    const count = kwGeoSet.size;
+    const geoScore = count > 0 ? geoBudget / count : 0;
+    locationServiceGeoScoreMap.set(compositeKey, geoScore);
+    const [location, service] = compositeKey.split('|');
+    console.log('Location "' + location + '" + Service "' + service + '": ' + count + ' unique geo keywords, score per keyword = ' + geoScore.toFixed(6));
   }
 
   // Build a set of location tokens for geo detection
@@ -93,6 +128,8 @@ function runFinalMerge() {
   const finalRaw = [];
   const rankingKeywordScores = [];
   const rankingFinalScores = [];
+  const rankingIdealScores = [];
+  const rankingGapScores = [];
   const sampleLookups = []; // For diagnostic logging
   for (let r = 1; r < rValues.length; r++) {
     const row = rValues[r];
@@ -117,13 +154,16 @@ function runFinalMerge() {
     const kKey = normalizeKey(keyword);
     let keywordScore = 0;
     if (useGeo) {
-      if (!keywordGeoMap.has(kKey)) {
-        console.warn('Keyword geo score missing for "' + String(keyword || '') + '"; defaulting to 0');
-        keywordScore = 0;
-      } else {
-        keywordScore = Number(keywordGeoMap.get(kKey)) || 0;
+      // Geo keywords: use per-location-service geo score (0.34 / unique kw+geo count for this location-service combination)
+      const geoNorm = normalizeKey(geo);
+      const serviceNorm = normalizeKey(service);
+      const compositeKey = geoNorm + '|' + serviceNorm;
+      keywordScore = locationServiceGeoScoreMap.get(compositeKey) || 0;
+      if (keywordScore === 0) {
+        console.warn('Geo keyword score missing for location "' + String(geo || '') + '" and service "' + String(service || '') + '"; defaulting to 0');
       }
     } else {
+      // Core keywords: lookup from Keyword sheet (pre-calculated with decay)
       if (!keywordCoreMap.has(kKey)) {
         console.warn('Keyword core score missing for "' + String(keyword || '') + '"; defaulting to 0');
         keywordScore = 0;
@@ -135,12 +175,16 @@ function runFinalMerge() {
     // For Rankings tab audit columns
     rankingKeywordScores.push(keywordScore);
     rankingFinalScores.push(keywordScore * rankingScore);
+    const ideal = locationScore * nicheScore * keywordScore;
+    rankingIdealScores.push(ideal);
     const raw = locationScore * nicheScore * keywordScore * rankingScore;
+    const gap = ideal - raw; // GAP = Ideal - Final Score
+    rankingGapScores.push(gap);
     finalRaw.push(raw);
     outRows.push([
       service,
       geo,
-      keyword,
+      kwPlusGeo, // Use kw+geo instead of keyword for easier tracking
       locationScore,
       nicheScore,
       keywordScore,
@@ -161,20 +205,134 @@ function runFinalMerge() {
     console.log('    Niche score: ' + lookup.score);
   }
   
+  // Aggregate Ideal and Actual scores by Location
+  const locationAggregates = new Map(); // normalized location -> {ideal, actual}
+  for (let i = 0; i < outRows.length; i++) {
+    const geoRaw = outRows[i][1]; // geo column
+    const geoNorm = normalizeKey(geoRaw);
+    const ideal = rankingIdealScores[i];
+    const actual = finalRaw[i];
+    
+    if (!locationAggregates.has(geoNorm)) {
+      locationAggregates.set(geoNorm, {ideal: 0, actual: 0});
+    }
+    const agg = locationAggregates.get(geoNorm);
+    agg.ideal += ideal;
+    agg.actual += actual;
+  }
+  
+  // Aggregate Ideal and Actual scores by Service
+  const serviceAggregates = new Map(); // normalized service -> {ideal, actual}
+  for (let i = 0; i < outRows.length; i++) {
+    const serviceRaw = outRows[i][0]; // service column
+    const serviceNorm = normalizeKey(serviceRaw);
+    const ideal = rankingIdealScores[i];
+    const actual = finalRaw[i];
+    
+    if (!serviceAggregates.has(serviceNorm)) {
+      serviceAggregates.set(serviceNorm, {ideal: 0, actual: 0});
+    }
+    const agg = serviceAggregates.get(serviceNorm);
+    agg.ideal += ideal;
+    agg.actual += actual;
+  }
+  
   const finalNorm = normalizeVector(finalRaw);
   logSumCheck('Final normalized', finalNorm);
   for (let i = 0; i < outRows.length; i++) outRows[i][8] = finalNorm[i];
 
-  // Write Rankings audit columns: keyword score and final score (keyword * ranking modifier)
+  // Write Rankings audit columns: keyword score, KW x Ranking, Ideal, and GAP
   if (rankingKeywordScores.length) {
     writeColumnByHeader(rankings, 'keyword score', rankingKeywordScores);
   }
   if (rankingFinalScores.length) {
-    writeColumnByHeader(rankings, 'final score', rankingFinalScores);
+    writeColumnByHeader(rankings, 'KW x Ranking', rankingFinalScores);
+  }
+  if (rankingIdealScores.length) {
+    writeColumnByHeader(rankings, 'Ideal', rankingIdealScores);
+  }
+  if (rankingGapScores.length) {
+    writeColumnByHeader(rankings, 'GAP', rankingGapScores);
+  }
+
+  // Write aggregated Ideal, Actual, and GAP to Location sheet
+  const locIdealCol = [];
+  const locActualCol = [];
+  const locGapCol = [];
+  for (let r = 1; r < lValues.length; r++) {
+    const row = lValues[r];
+    const targetNorm = normalizeKey(row[idxTarget]);
+    const agg = locationAggregates.get(targetNorm);
+    if (agg) {
+      locIdealCol.push(agg.ideal);
+      locActualCol.push(agg.actual);
+      locGapCol.push(agg.ideal - agg.actual);
+    } else {
+      locIdealCol.push(0);
+      locActualCol.push(0);
+      locGapCol.push(0);
+    }
+  }
+  if (locIdealCol.length) {
+    writeColumnByHeader(locationSheet, 'Ideal Score (Sum: Location×Service×Keyword)', locIdealCol);
+    writeColumnByHeader(locationSheet, 'Actual Score (Sum: Location×Service×Keyword×Ranking)', locActualCol);
+    writeColumnByHeader(locationSheet, 'Opportunity GAP (Ideal - Actual)', locGapCol);
+  }
+  
+  // Log top 3 locations by GAP
+  const locationGapList = [];
+  for (let r = 1; r < lValues.length; r++) {
+    const row = lValues[r];
+    const targetName = String(row[idxTarget] || '');
+    const gap = locGapCol[r - 1] || 0;
+    locationGapList.push({name: targetName, gap: gap});
+  }
+  locationGapList.sort((a, b) => b.gap - a.gap);
+  console.log('Top 3 Locations by Opportunity GAP:');
+  for (let i = 0; i < Math.min(3, locationGapList.length); i++) {
+    console.log('  ' + (i + 1) + '. ' + locationGapList[i].name + ' = ' + locationGapList[i].gap.toFixed(6));
+  }
+
+  // Write aggregated Ideal, Actual, and GAP to Niche sheet
+  const nicheIdealCol = [];
+  const nicheActualCol = [];
+  const nicheGapCol = [];
+  for (let r = 1; r < nValues.length; r++) {
+    const row = nValues[r];
+    const serviceNorm = normalizeKey(row[idxNService]);
+    const agg = serviceAggregates.get(serviceNorm);
+    if (agg) {
+      nicheIdealCol.push(agg.ideal);
+      nicheActualCol.push(agg.actual);
+      nicheGapCol.push(agg.ideal - agg.actual);
+    } else {
+      nicheIdealCol.push(0);
+      nicheActualCol.push(0);
+      nicheGapCol.push(0);
+    }
+  }
+  if (nicheIdealCol.length) {
+    writeColumnByHeader(nicheSheet, 'Ideal Score (Sum: Location×Service×Keyword)', nicheIdealCol);
+    writeColumnByHeader(nicheSheet, 'Actual Score (Sum: Location×Service×Keyword×Ranking)', nicheActualCol);
+    writeColumnByHeader(nicheSheet, 'Opportunity GAP (Ideal - Actual)', nicheGapCol);
+  }
+  
+  // Log top 3 services by GAP
+  const serviceGapList = [];
+  for (let r = 1; r < nValues.length; r++) {
+    const row = nValues[r];
+    const serviceName = String(row[idxNService] || '');
+    const gap = nicheGapCol[r - 1] || 0;
+    serviceGapList.push({name: serviceName, gap: gap});
+  }
+  serviceGapList.sort((a, b) => b.gap - a.gap);
+  console.log('Top 3 Services by Opportunity GAP:');
+  for (let i = 0; i < Math.min(3, serviceGapList.length); i++) {
+    console.log('  ' + (i + 1) + '. ' + serviceGapList[i].name + ' = ' + serviceGapList[i].gap.toFixed(6));
   }
 
   // Write to Final sheet
-  const finalHeader = ['service','geo','keyword','location_score','niche_score','keyword_score','ranking_score','final_raw','final_normalized'];
+  const finalHeader = ['service','geo','kw+geo','location_score','niche_score','keyword_score','ranking_score','FINAL_SCORE','final_normalized'];
   let finalSheet = ss.getSheetByName('Final');
   if (!finalSheet) finalSheet = ss.insertSheet('Final');
   finalSheet.clearContents();
@@ -209,10 +367,10 @@ function visualizeFinalScores() {
   
   const idxService = normHeader.indexOf('service');
   const idxGeo = normHeader.indexOf('geo');
-  const idxKeyword = normHeader.indexOf('keyword');
+  const idxKwGeo = normHeader.indexOf('kw+geo');
   const idxFinalNorm = normHeader.indexOf('final_normalized');
   
-  if ([idxService, idxGeo, idxKeyword, idxFinalNorm].some(i => i === -1)) {
+  if ([idxService, idxGeo, idxKwGeo, idxFinalNorm].some(i => i === -1)) {
     throw new Error('Final sheet missing required columns');
   }
 
@@ -222,16 +380,16 @@ function visualizeFinalScores() {
     const row = values[r];
     const service = String(row[idxService] || '');
     const geo = String(row[idxGeo] || '');
-    const keyword = String(row[idxKeyword] || '');
+    const kwGeo = String(row[idxKwGeo] || '');
     const finalNorm = Number(row[idxFinalNorm]) || 0;
     
-    if (service || geo || keyword) {
+    if (service || geo || kwGeo) {
       rows.push({
         service: service,
         geo: geo,
-        keyword: keyword,
+        kwGeo: kwGeo,
         final_normalized: finalNorm,
-        label: service + ' | ' + geo + ' | ' + keyword
+        label: service + ' | ' + geo + ' | ' + kwGeo
       });
     }
   }
@@ -259,7 +417,7 @@ function visualizeFinalScores() {
   }
   
   // Write visualization data to new sheet
-  const vizHeader = ['Position', 'Final Score', 'Service | Geo | Keyword'];
+  const vizHeader = ['Position', 'Final Score', 'Service | Geo | kw+geo'];
   vizSheet.getRange(1, 1, 1, 3).setValues([vizHeader]);
   
   const vizData = [];
