@@ -123,11 +123,9 @@ function runFinalMerge() {
     return false;
   }
 
-  // Build final rows
-  const outRows = [];
+  // Build final scores
   const finalRaw = [];
   const rankingKeywordScores = [];
-  const rankingFinalScores = [];
   const rankingIdealScores = [];
   const rankingGapScores = [];
   const sampleLookups = []; // For diagnostic logging
@@ -174,24 +172,12 @@ function runFinalMerge() {
     const rankingScore = idxRankMod !== -1 ? (Number(row[idxRankMod]) || 0) : 0;
     // For Rankings tab audit columns
     rankingKeywordScores.push(keywordScore);
-    rankingFinalScores.push(keywordScore * rankingScore);
     const ideal = locationScore * nicheScore * keywordScore;
     rankingIdealScores.push(ideal);
     const raw = locationScore * nicheScore * keywordScore * rankingScore;
     const gap = ideal - raw; // GAP = Ideal - Final Score
     rankingGapScores.push(gap);
     finalRaw.push(raw);
-    outRows.push([
-      service,
-      geo,
-      kwPlusGeo, // Use kw+geo instead of keyword for easier tracking
-      locationScore,
-      nicheScore,
-      keywordScore,
-      rankingScore,
-      raw,
-      0 // placeholder for final_normalized
-    ]);
   }
   
   // Diagnostic: log sample lookups
@@ -207,9 +193,11 @@ function runFinalMerge() {
   
   // Aggregate Ideal and Actual scores by Location
   const locationAggregates = new Map(); // normalized location -> {ideal, actual}
-  for (let i = 0; i < outRows.length; i++) {
-    const geoRaw = outRows[i][1]; // geo column
+  for (let r = 1; r < rValues.length; r++) {
+    const row = rValues[r];
+    const geoRaw = row[idxGeo];
     const geoNorm = normalizeKey(geoRaw);
+    const i = r - 1;
     const ideal = rankingIdealScores[i];
     const actual = finalRaw[i];
     
@@ -223,9 +211,11 @@ function runFinalMerge() {
   
   // Aggregate Ideal and Actual scores by Service
   const serviceAggregates = new Map(); // normalized service -> {ideal, actual}
-  for (let i = 0; i < outRows.length; i++) {
-    const serviceRaw = outRows[i][0]; // service column
+  for (let r = 1; r < rValues.length; r++) {
+    const row = rValues[r];
+    const serviceRaw = row[idxService];
     const serviceNorm = normalizeKey(serviceRaw);
+    const i = r - 1;
     const ideal = rankingIdealScores[i];
     const actual = finalRaw[i];
     
@@ -237,22 +227,18 @@ function runFinalMerge() {
     agg.actual += actual;
   }
   
-  const finalNorm = normalizeVector(finalRaw);
-  logSumCheck('Final normalized', finalNorm);
-  for (let i = 0; i < outRows.length; i++) outRows[i][8] = finalNorm[i];
-
-  // Write Rankings audit columns: keyword score, KW x Ranking, Ideal, and GAP
+  // Write Rankings audit columns: keyword score, Ideal, GAP, and FINAL_SCORE
   if (rankingKeywordScores.length) {
     writeColumnByHeader(rankings, 'keyword score', rankingKeywordScores);
-  }
-  if (rankingFinalScores.length) {
-    writeColumnByHeader(rankings, 'KW x Ranking', rankingFinalScores);
   }
   if (rankingIdealScores.length) {
     writeColumnByHeader(rankings, 'Ideal', rankingIdealScores);
   }
   if (rankingGapScores.length) {
     writeColumnByHeader(rankings, 'GAP', rankingGapScores);
+  }
+  if (finalRaw.length) {
+    writeColumnByHeader(rankings, 'FINAL_SCORE', finalRaw);
   }
 
   // Write aggregated Ideal, Actual, and GAP to Location sheet
@@ -329,135 +315,6 @@ function runFinalMerge() {
   console.log('Top 3 Services by Opportunity GAP:');
   for (let i = 0; i < Math.min(3, serviceGapList.length); i++) {
     console.log('  ' + (i + 1) + '. ' + serviceGapList[i].name + ' = ' + serviceGapList[i].gap.toFixed(6));
-  }
-
-  // Write to Final sheet
-  const finalHeader = ['service','geo','kw+geo','location_score','niche_score','keyword_score','ranking_score','FINAL_SCORE','final_normalized'];
-  let finalSheet = ss.getSheetByName('Final');
-  if (!finalSheet) finalSheet = ss.insertSheet('Final');
-  finalSheet.clearContents();
-  finalSheet.getRange(1, 1, 1, finalHeader.length).setValues([finalHeader]);
-  if (outRows.length > 0) {
-    finalSheet.getRange(2, 1, outRows.length, finalHeader.length).setValues(outRows);
-    // shade entire Final output table (all columns are outputs)
-    try {
-      var bg = OUTPUT_BG_COLOR || '#FFF2CC';
-      finalSheet.getRange(1, 1, outRows.length + 1, finalHeader.length).setBackground(bg);
-    } catch (e) {
-      // ignore styling errors
-    }
-  }
-}
-
-/**
- * Visualize final scores - shows top keywords by final_normalized value
- * Creates sortable data for charting most important keywords to target
- */
-function visualizeFinalScores() {
-  const ss = getSpreadsheet();
-  const finalSheet = getSheet('Final');
-  const values = getDataRangeValues(finalSheet);
-  if (values.length < 2) {
-    console.log('No Final data to visualize. Run Final Merge first.');
-    return;
-  }
-
-  const header = values[0].map(h => String(h));
-  const normHeader = header.map(h => normalizeKey(h));
-  
-  const idxService = normHeader.indexOf('service');
-  const idxGeo = normHeader.indexOf('geo');
-  const idxKwGeo = normHeader.indexOf('kw+geo');
-  const idxFinalNorm = normHeader.indexOf('final_normalized');
-  
-  if ([idxService, idxGeo, idxKwGeo, idxFinalNorm].some(i => i === -1)) {
-    throw new Error('Final sheet missing required columns');
-  }
-
-  // Build array of rows with final_normalized scores
-  const rows = [];
-  for (let r = 1; r < values.length; r++) {
-    const row = values[r];
-    const service = String(row[idxService] || '');
-    const geo = String(row[idxGeo] || '');
-    const kwGeo = String(row[idxKwGeo] || '');
-    const finalNorm = Number(row[idxFinalNorm]) || 0;
-    
-    if (service || geo || kwGeo) {
-      rows.push({
-        service: service,
-        geo: geo,
-        kwGeo: kwGeo,
-        final_normalized: finalNorm,
-        label: service + ' | ' + geo + ' | ' + kwGeo
-      });
-    }
-  }
-
-  // Sort by final_normalized (descending)
-  rows.sort((a, b) => b.final_normalized - a.final_normalized);
-
-  // Write visualization columns to Final sheet
-  const positions = [];
-  const scores = [];
-  const labels = [];
-  
-  for (let i = 0; i < rows.length; i++) {
-    positions.push(i + 1);
-    scores.push(rows[i].final_normalized);
-    labels.push(rows[i].label);
-  }
-
-  // Create or get visualization sheet
-  let vizSheet = ss.getSheetByName('Final Visualization');
-  if (!vizSheet) {
-    vizSheet = ss.insertSheet('Final Visualization');
-  } else {
-    vizSheet.clearContents();
-  }
-  
-  // Write visualization data to new sheet
-  const vizHeader = ['Position', 'Final Score', 'Service | Geo | kw+geo'];
-  vizSheet.getRange(1, 1, 1, 3).setValues([vizHeader]);
-  
-  const vizData = [];
-  for (let i = 0; i < rows.length; i++) {
-    vizData.push([positions[i], scores[i], labels[i]]);
-  }
-  
-  if (vizData.length > 0) {
-    vizSheet.getRange(2, 1, vizData.length, 3).setValues(vizData);
-    
-    // Format header
-    vizSheet.getRange(1, 1, 1, 3).setFontWeight('bold').setBackground('#E8F0FE');
-    
-    // Automatically create a chart on the visualization sheet
-    try {
-      const numRows = Math.min(rows.length, 100); // Limit to top 100 for readability
-      const chartRange = vizSheet.getRange(1, 1, numRows + 1, 2); // Position and score columns
-      
-      const chartBuilder = vizSheet.newChart()
-        .setChartType(Charts.ChartType.LINE)
-        .addRange(chartRange)
-        .setPosition(2, 5, 0, 0) // Position chart next to data
-        .setOption('title', 'Top Keywords by Final Score (Most Important to Target)')
-        .setOption('hAxis.title', 'Position (Rank)')
-        .setOption('vAxis.title', 'Final Normalized Score')
-        .setOption('legend.position', 'none')
-        .setOption('pointSize', 3)
-        .setOption('lineWidth', 2)
-        .setOption('curveType', 'function'); // Smooth curve
-      
-      vizSheet.insertChart(chartBuilder.build());
-      console.log('Chart created on Final Visualization sheet');
-    } catch (e) {
-      console.warn('Could not create chart automatically:', e.message);
-    }
-  }
-  
-  console.log('Top 5 keywords to target:');
-  for (let i = 0; i < Math.min(5, rows.length); i++) {
-    console.log((i + 1) + '. ' + rows[i].label + ' = ' + rows[i].final_normalized.toFixed(6));
   }
 }
 
