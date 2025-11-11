@@ -4,78 +4,7 @@ A modular Google Apps Script scoring system that quantifies the value of local S
 
 ## Overview
 
-This system calculates normalized scores across multiple dimensions to identify keyword opportunities across markets. Each scoring component is normalized independently and combined multiplicatively to produce a final normalized value.
-
-## Key Discoveries: Implementation Fixes
-
-### Discovery 1: Per-Service Budget Allocation
-
-**Current Implementation (KeywordScore2.gs):**
-- Each service gets the FULL budget allocation (not divided across services)
-- Core keywords: Each service gets `partitionSplit` (0.66) divided among its core keywords with decay
-- Geo keywords: Each service gets `(1 - partitionSplit)` (0.34) per location divided among its geo keywords in that location
-- Logarithmic decay applied within each service's keyword group
-
-**Why This Matters:**
-- Each service (wildlife, raccoon, squirrel, bat) is treated independently
-- A service with 4 core keywords gets 0.66, each keyword weighted by decay position
-- Same service's geo keywords in Atlanta get 0.34 / (count of geo keywords for that service in Atlanta)
-- Allows proper scaling across multiple service lines without dilution
-
-**Example:**
-- Wildlife removal in Riverview with 10 geo keywords: each gets 0.34/10 = 0.034
-- Raccoon removal in Riverview with 3 geo keywords: each gets 0.34/3 = 0.113
-- Each service maintains its full budget allocation independently
-
-### Discovery 2: Ranking Modifier Score Normalization
-
-**The Problem:**
-- Ranking modifier scores were being normalized (sum = 1)
-- This turned rank 1 from 1.0 into ~0.0347
-- Client requirement: rank 1 should be 1.0
-
-**Why This Matters:**
-- Ranking modifier acts as a **performance multiplier** in the final score calculation
-- If rank 1 = 0.0347 instead of 1.0, it unfairly penalizes rank 1 performance
-- Rank 1 should preserve full value (multiply by 1.0), not be penalized
-
-**The Fix:**
-- Removed normalization from ranking modifier scores
-- Now using raw decay curve values directly (no normalization)
-- Rank 1 = 1.0 (no penalty, preserves full value)
-- Rank 2 = exp(-kappa × 1) (small multiplier)
-- Rank 3 = exp(-kappa × 2) (smaller multiplier)
-- Ranks 4-10 = continue decaying (very small but visible)
-- Ranks > 10 = 0 (as expected)
-
-**Result:**
-- Rank 1 correctly multiplies by 1.0 (preserves full value)
-- Lower ranks get appropriate decay multipliers
-- Decay curve steepness controlled by `rank modification kappa` in Config
-- Ranking modifier is now a true performance multiplier, not a normalized score
-
-### Discovery 3: Niche Score Join Issue
-
-**The Problem:**
-- Final scores were all zero because `niche_score` was zero
-- Diagnostic logging revealed: Niche sheet had "raccoon", "squirrel", "bat"
-- Rankings sheet was looking for "wildlife removal"
-- Join failed because service values didn't match
-
-**Why This Matters:**
-- The final score calculation is multiplicative: `final_raw = location × niche × keyword × ranking`
-- If any component is zero, the final score becomes zero
-- Service names must match exactly (case-insensitive, trimmed) between Niche and Rankings sheets
-
-**The Fix:**
-- Added "wildlife removal" service to Niche sheet with Keyword Planner Score
-- Re-ran Niche Score script to recalculate normalized scores
-- Now Niche sheet contains all services that appear in Rankings sheet
-
-**Result:**
-- Niche scores now properly match between Niche and Rankings sheets
-- Final scores calculated correctly with all components non-zero
-- Diagnostic logging added to FinalMerge to help identify future join issues
+This system calculates normalized scores across multiple dimensions to identify keyword opportunities across markets. Each scoring component is normalized independently and combined multiplicatively to produce a final priority score with GAP analysis at keyword, location, and service levels.
 
 ## Project Structure
 
@@ -90,6 +19,8 @@ This system calculates normalized scores across multiple dimensions to identify 
 7. **Utils.gs** - Shared utility functions for sheet operations and normalization
 8. **Config.gs** - Configuration management and spreadsheet ID resolution
 
+**Note:** Historical implementations (KeywordScore.gs, KeywordScore1.gs) are preserved for reference but not actively used.
+
 ### Sheets
 
 - **Config** - Configuration parameters (partition split, kappa, rank modification kappa, poverty line)
@@ -99,7 +30,7 @@ This system calculates normalized scores across multiple dimensions to identify 
 - **Rankings** - Ranking data with all computed scores (keyword score, Ideal, GAP, FINAL_SCORE)
 - **Log** - Audit log of normalization checks
 
-**Note:** The "Final" sheet has been removed. All final scores now appear in the Rankings sheet.
+**Note:** The Final sheet has been removed to eliminate redundancy. All final scores and analysis now appear in the Rankings sheet.
 
 ## Calculation Flow
 
@@ -116,10 +47,10 @@ This system calculates normalized scores across multiple dimensions to identify 
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `partition split` | 0.66 | Fraction of total value allocated to core keywords |
-| `kappa` | 1 | Curve steepness (for ranking decay, not keyword scoring) |
+| `partition split` | 0.66 | Fraction of total value allocated to core keywords per service |
+| `kappa` | 1 | Curve steepness for keyword decay within service groups |
 | `rank modification kappa` | 10 | Decay steepness for ranking positions |
-| `poverty_line` | 32000 | Poverty line for location calculation |
+| `poverty_line` | 32000 | Poverty line threshold for location calculation |
 
 ## Usage
 
@@ -136,38 +67,50 @@ This system calculates normalized scores across multiple dimensions to identify 
    - **Final Merge** - Combine all scores, write to Rankings sheet, calculate GAPs
    - **Clear Log** - Clear the Log sheet
 
-## Current Status
+## Implementation Notes
 
-✅ **Per-service budget allocation** - Each service gets full budget (0.66 core + 0.34 geo per location), not divided across services.
+### Per-Service Budget Allocation
 
-✅ **Ranking modifier score fixed** - Uses raw decay scores (no normalization) so rank 1 = 1.0 as multiplier.
+Each service (wildlife, raccoon, squirrel, bat) gets the **full budget allocation** independently:
+- Core keywords: Full `partitionSplit` (0.66) per service, distributed with logarithmic decay
+- Geo keywords: Full `(1 - partitionSplit)` (0.34) per location per service, divided equally
 
-✅ **Niche score join fixed** - Added diagnostic logging and identified service name mismatch between Niche and Rankings sheets.
+**Example:**
+- Wildlife removal in Riverview with 10 geo keywords: each gets 0.34/10 = 0.034
+- Raccoon removal in Riverview with 3 geo keywords: each gets 0.34/3 = 0.113
 
-✅ **Sheet consolidation** - Removed redundant Final sheet; all scores now in Rankings sheet.
+This allows proper scaling across multiple service lines without budget dilution.
 
-✅ **GAP analysis** - Opportunity GAP calculated at keyword, location, and service levels.
+### Ranking as Performance Multiplier
 
-✅ **Code cleanup** - Removed unused visualization functions, redundant columns, and obsolete menu items.
+Ranking scores use **raw logarithmic decay values** (no normalization):
+- Rank 1 = 1.0 (preserves full value)
+- Rank 2-10 = decaying multipliers based on `rank modification kappa`
+- Ranks > 10 = 0
 
-## Active Implementation: KeywordScore2.gs
+This treats ranking as a performance multiplier rather than a normalized score component.
 
-The system uses `KeywordScore2.gs` which implements per-service budget allocation:
-- Each service gets the full `partitionSplit` (0.66) for core keywords
-- Each service gets the full `(1 - partitionSplit)` (0.34) for geo keywords per location
-- Logarithmic decay applied within each service group
-- Outputs: `keyword core score` column only (geo scores calculated dynamically in FinalMerge)
+### Service Name Matching
 
-**Note:** Historical implementations (KeywordScore.gs, KeywordScore1.gs) are preserved for reference but not actively used.
+Service names must match exactly (case-insensitive, trimmed) between Niche and Rankings sheets. Diagnostic logging in FinalMerge helps identify mismatches that would cause zero scores.
+
+### GAP Analysis
+
+Opportunity GAP = `Ideal - Actual` where:
+- **Ideal** = location × niche × keyword (assumes perfect ranking = 1.0)
+- **Actual** = location × niche × keyword × ranking
+- **GAP** = lost opportunity due to ranking position
+
+Higher GAP values indicate keywords/locations/services where ranking improvements would have the most impact.
 
 ## References
 
 - Project Brief: `rank_score_calculator_brief.md`
 - Instructions Summary: `instructions_summary_transcript.ms`
 - Meeting Transcript: `captions (16).srt`
+- Implementation Plans: `docs/rank_score_calculator_plan.md`, `docs/keyword_scoring_fix_plan.md`
 
 ## Authors
 
 - Gordon Ligon (project architecture)
 - Daniel Capistrano (implementation)
-
