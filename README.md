@@ -103,6 +103,44 @@ Opportunity GAP = `Ideal - Actual` where:
 
 Higher GAP values indicate keywords/locations/services where ranking improvements would have the most impact.
 
+## Keyword Ranking System
+
+The project also includes a keyword ranking tracking system (`Gordon-kw-script-v3.2.js`) that:
+- Generates keyword variations from templates, niches, and locations
+- Submits ranking jobs to DataForSEO API
+- Tracks ranking positions for target domain (aaacwildliferemoval.com)
+- Writes results to `ranking_results` sheet with position, URL, and keyword
+
+### Current Sheets
+
+- **kw_variants** - Generated keyword variations with coordinates
+- **config** - Currently holds both configuration (batch size) and job logs (Job IDs, timestamps, status)
+- **ranking_results** - Ranking positions, URLs, and keywords (columns A-C)
+
+### Planned Improvements
+
+> **Note:** This section should be removed after the improvements are implemented.
+
+#### 1. Split Config Sheet
+
+**Current State:** The `config` sheet serves dual purposes:
+- Configuration parameters (batch size)
+- Job execution logs (Job IDs, keywords, source rows, status, timestamps)
+
+**Planned Change:** Split into two separate sheets:
+- **config** - Configuration only (batch size, future config parameters)
+- **logs** - Job execution logs (Job IDs, keywords, source rows, status, submitted/completed timestamps)
+
+This separation will improve maintainability and make it easier to add additional configuration parameters without cluttering the logs.
+
+#### 2. Additional Audit Columns for ranking_results
+
+**Planned Addition:** Add two new columns to `ranking_results` sheet for auditing purposes:
+- **Column J** - Location (e.g., "Riverview", "Port Richey")
+- **Column K** - Service (e.g., "wildlife removal", "raccoon removal")
+
+These columns will help with data analysis and filtering of ranking results by location and service type.
+
 ## References
 
 - Project Brief: `rank_score_calculator_brief.md`

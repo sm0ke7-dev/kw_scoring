@@ -1,6 +1,8 @@
 function onOpen() {
-  SpreadsheetApp.getUi()
-    .createMenu('Rank Scoring')
+  const ui = SpreadsheetApp.getUi();
+  
+  // Rank Scoring menu
+  ui.createMenu('Rank Scoring')
     .addItem('Run All', 'runAll')
     .addSeparator()
     .addItem('Location Score', 'runLocationScore')
@@ -10,6 +12,17 @@ function onOpen() {
     .addItem('Final Merge', 'runFinalMerge')
     .addSeparator()
     .addItem('Clear Log', 'clearLog')
+    .addToUi();
+  
+  // Gordon KW + Rankings menu
+  ui.createMenu('🔍 Gordon KW + Rankings')
+    .addItem('Run Ranking Check on Sheet', 'runRankingCheckOnSheet')
+    .addItem('On-demand Check', 'checkRankingsOnly')
+    .addItem('Test DataForSEO Connection', 'testDataForSEOConnection')
+    .addSeparator()
+    .addItem('🛑 Stop All Schedulers', 'stopAllSchedulers')
+    .addItem('🔄 Reset Submit Cursor', 'resetSubmitCursor')
+    .addItem('🗑️ Clear Results Sheets', 'clearResultsSheets')
     .addToUi();
 }
 
