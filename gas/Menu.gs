@@ -8,7 +8,7 @@ function onOpen() {
     .addItem('Location Score', 'runLocationScore')
     .addItem('Niche Score', 'runNicheScore')
     .addItem('Keyword Score', 'runKeywordScore')
-    .addItem('Ranking Score', 'runRankingScore')
+    .addItem('Ranking Score', 'runGRankingScore')
     .addItem('Final Merge', 'runFinalMerge')
     .addSeparator()
     .addItem('Clear Log', 'clearLog')
@@ -17,8 +17,11 @@ function onOpen() {
   // Gordon KW + Rankings menu
   ui.createMenu('🔍 Gordon KW + Rankings')
     .addItem('Run Ranking Check on Sheet', 'runRankingCheckOnSheet')
-    .addItem('On-demand Check', 'checkRankingsOnly')
     .addItem('Test DataForSEO Connection', 'testDataForSEOConnection')
+    .addSeparator()
+    .addItem('🔄 Retry Pending Tasks', 'retryPendingTasks')
+    .addSeparator()
+    .addItem('🔄 Reset All Ranking Data', 'resetAllRankingData')
     .addSeparator()
     .addItem('🛑 Stop All Schedulers', 'stopAllSchedulers')
     .addItem('🔄 Reset Submit Cursor', 'resetSubmitCursor')
@@ -30,7 +33,7 @@ function runAll() {
   runLocationScore();
   runNicheScore();
   runKeywordScore();
-  runRankingScore();
+  runGRankingScore();
   runFinalMerge();
 }
 

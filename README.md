@@ -114,24 +114,49 @@ The project also includes a keyword ranking tracking system (`Gordon-kw-script-v
 ### Current Sheets
 
 - **kw_variants** - Generated keyword variations with coordinates
-- **config** - Currently holds both configuration (batch size) and job logs (Job IDs, timestamps, status)
+- **config** - Configuration parameters (columns A-G):
+  - A: Batch Size (ranking system)
+  - B: Submit Interval (minutes) (ranking system)
+  - C: Fetch Interval (minutes) (ranking system)
+  - D: partition split (scoring system)
+  - E: kappa (scoring system)
+  - F: rank modification kappa (scoring system)
+  - G: poverty_line (scoring system)
+- **logs** - Job execution logs (Job IDs, keywords, source rows, status, timestamps)
 - **ranking_results** - Ranking positions, URLs, and keywords (columns A-C)
+
+### Version 3.3.2 Changelog
+
+**Major Improvements:**
+- ✅ **Config/Logs Separation**: Split config sheet into separate `config` (settings) and `logs` (job execution data) sheets for better organization
+- ✅ **Configurable Trigger Intervals**: Submit and fetch intervals can now be configured via config sheet (columns B & C) without code changes
+- ✅ **Reset All Function**: Added "🔄 Reset All Ranking Data" menu option that combines stop schedulers, reset cursor, and clear sheets in one action
+- ✅ **Code Organization**: Extracted `GENERATE_KEYWORDS` function to `gas/GenerateKeywords.gs` module
+- ✅ **Removed Unused Code**: Removed `checkRankingsOnly()` function (on-demand check) - ~258 lines removed
+
+**Bug Fixes:**
+- ✅ Fixed fetch trigger recreation - fetch trigger now automatically recreated when new tasks are submitted
+- ✅ Updated config sheet structure - scoring system now uses columns D-G (was I-L)
+
+**Config Sheet Structure (v3.3.2):**
+- **Row 1 (Headers):** Batch Size | Submit Interval (minutes) | Fetch Interval (minutes) | partition split | kappa | rank modification kappa | poverty_line
+- **Row 2 (Values):** Defaults: 50 | 5 | 5 | 0.66 | 1 | 10 | 32000
 
 ### Planned Improvements
 
 > **Note:** This section should be removed after the improvements are implemented.
 
-#### 1. Split Config Sheet
+#### 1. Split Config Sheet ✅ **COMPLETED in v3.3.2**
 
-**Current State:** The `config` sheet serves dual purposes:
-- Configuration parameters (batch size)
-- Job execution logs (Job IDs, keywords, source rows, status, timestamps)
+~~**Current State:** The `config` sheet serves dual purposes:~~
+~~- Configuration parameters (batch size)~~
+~~- Job execution logs (Job IDs, keywords, source rows, status, timestamps)~~
 
-**Planned Change:** Split into two separate sheets:
-- **config** - Configuration only (batch size, future config parameters)
+**Implemented:** Split into two separate sheets:
+- **config** - Configuration only (batch size, submit/fetch intervals, scoring parameters)
 - **logs** - Job execution logs (Job IDs, keywords, source rows, status, submitted/completed timestamps)
 
-This separation will improve maintainability and make it easier to add additional configuration parameters without cluttering the logs.
+This separation improves maintainability and makes it easier to add additional configuration parameters without cluttering the logs.
 
 #### 2. Additional Audit Columns for ranking_results
 

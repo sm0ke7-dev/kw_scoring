@@ -1,0 +1,449 @@
+/**
+ * retryPendingTasks_V1.3.gs
+ * Enhanced fetch functionality with manual retry, better logging, timeout handling, and improved status handling
+ * V1.2: Added proper handling for "no_results" status - marks as "no_results" instead of "pending"
+ * V1.3: Added batched submissions to avoid execution time limits and API issues
+ */
+
+/**
+ * Manual retry function for pending tasks
+ * Resubmits all pending tasks in batches and then attempts to fetch results
+ */
+function retryPendingTasks() {
+  const sheet = SpreadsheetApp.getActive().getSheetByName('kw_variants') || SpreadsheetApp.getActiveSheet();
+  const logs = getLogsSheet();
+  
+  const lastRow = logs.getLastRow();
+  if (lastRow < 2) {
+    SpreadsheetApp.getUi().alert('ℹ️ No Tasks', 'No tasks found in logs sheet.', SpreadsheetApp.getUi().ButtonSet.OK);
+    return;
+  }
+  
+  // Read all log rows
+  const logRows = logs.getRange(2, 1, lastRow - 1, 6).getValues(); // A..F
+  const pendingTasks = [];
+  
+  // Step 1: Collect all pending tasks and get their coordinates from kw_variants (OPTIMIZED: batch read)
+  console.log(`🔍 Finding pending tasks to resubmit...`);
+  
+  // First pass: Collect all unique row numbers that need to be read
+  const rowNumbersToRead = new Set();
+  const logEntries = [];
+  
+  for (let i = 0; i < logRows.length; i++) {
+    const taskId = logRows[i][0]; // A: Job IDs
+    const keyword = logRows[i][1]; // B: Keyword
+    const sourceRow = logRows[i][2]; // C: Source Row
+    const status = logRows[i][3]; // D: status
+    const completedAt = logRows[i][5]; // F: completed timestamp
+    
+    // Only process pending/submitted tasks that haven't been completed
+    // Skip "no_results" - task is complete, no rankings found
+    if (!taskId) continue;
+    if (status === 'fetched' && completedAt) continue;
+    if (status === 'no_results') continue; // Skip - already marked as no results
+    
+    // Convert sourceRow to row number
+    let rowNum = null;
+    if (sourceRow) {
+      if (sourceRow instanceof Date) {
+        const excelEpoch = new Date(1899, 11, 30);
+        const daysDiff = Math.floor((sourceRow.getTime() - excelEpoch.getTime()) / (1000 * 60 * 60 * 24));
+        rowNum = daysDiff >= 1 ? daysDiff + 1 : null;
+      } else {
+        const numRow = Number(sourceRow);
+        if (numRow >= 2 && Number.isFinite(numRow)) {
+          rowNum = Math.floor(numRow);
+        }
+      }
+    }
+    
+    if (rowNum) {
+      rowNumbersToRead.add(rowNum);
+    }
+    
+    logEntries.push({
+      taskId: taskId,
+      keyword: keyword,
+      sourceRow: sourceRow,
+      rowNum: rowNum,
+      logIndex: i + 2
+    });
+  }
+  
+  if (logEntries.length === 0) {
+    SpreadsheetApp.getUi().alert('ℹ️ No Pending Tasks', 'No pending tasks found to resubmit.', SpreadsheetApp.getUi().ButtonSet.OK);
+    return;
+  }
+  
+  // Batch read all needed rows from kw_variants in one call
+  console.log(`📖 Batch reading ${rowNumbersToRead.size} rows from kw_variants...`);
+  const rowMap = new Map();
+  
+  if (rowNumbersToRead.size > 0) {
+    const rowArray = Array.from(rowNumbersToRead).sort((a, b) => a - b);
+    const minRow = Math.min(...rowArray);
+    const maxRow = Math.max(...rowArray);
+    const totalRows = maxRow - minRow + 1;
+    
+    // Read all rows in one batch (columns K, L, M)
+    try {
+      const batchData = sheet.getRange(minRow, 11, totalRows, 3).getValues(); // K, L, M
+      
+      // Create lookup map: row number -> [keyword, lat, lng]
+      for (let idx = 0; idx < batchData.length; idx++) {
+        const actualRow = minRow + idx;
+        if (rowNumbersToRead.has(actualRow)) {
+          rowMap.set(actualRow, batchData[idx]);
+        }
+      }
+      
+      console.log(`✅ Batch read complete: ${rowMap.size} rows loaded`);
+    } catch (e) {
+      console.error(`❌ Error batch reading from kw_variants:`, e);
+      SpreadsheetApp.getUi().alert('❌ Error', 'Failed to read data from kw_variants sheet. Check console logs.', SpreadsheetApp.getUi().ButtonSet.OK);
+      return;
+    }
+  }
+  
+  // Second pass: Use batch-read data to build pendingTasks array
+  for (const entry of logEntries) {
+    let kw = String(entry.keyword || '').trim();
+    let lat = null;
+    let lng = null;
+    
+    if (entry.rowNum && rowMap.has(entry.rowNum)) {
+      const kwData = rowMap.get(entry.rowNum);
+      kw = String(kwData[0] || entry.keyword || '').trim();
+      lat = Number(kwData[1]);
+      lng = Number(kwData[2]);
+    }
+    
+    if (kw && lat && lng) {
+      pendingTasks.push({
+        keyword: kw,
+        lat: lat,
+        lng: lng,
+        sourceRow: entry.sourceRow,
+        logIndex: entry.logIndex,
+        oldTaskId: entry.taskId
+      });
+      
+      if (pendingTasks.length % 100 === 0) {
+        console.log(`📝 Collected ${pendingTasks.length} tasks so far...`);
+      }
+    } else {
+      console.warn(`⚠️ Skipping task - missing data: keyword=${kw}, lat=${lat}, lng=${lng} (row ${entry.rowNum})`);
+    }
+  }
+  
+  console.log(`✅ Collected ${pendingTasks.length} pending tasks to resubmit`);
+  
+  if (pendingTasks.length === 0) {
+    SpreadsheetApp.getUi().alert('ℹ️ No Pending Tasks', 'No pending tasks found to resubmit.', SpreadsheetApp.getUi().ButtonSet.OK);
+    return;
+  }
+  
+  // Step 2: Resubmit all pending tasks in batches (V1.3: Batched to avoid timeouts)
+  const BATCH_SIZE = 500; // DataForSEO API limit
+  const totalBatches = Math.ceil(pendingTasks.length / BATCH_SIZE);
+  const allNewTaskIds = [];
+  let totalSubmitted = 0;
+  let totalFailed = 0;
+  
+  console.log(`📤 Resubmitting ${pendingTasks.length} pending tasks in ${totalBatches} batch(es) of ${BATCH_SIZE}...`);
+  SpreadsheetApp.getActive().toast(`📤 Resubmitting ${pendingTasks.length} tasks in ${totalBatches} batch(es)...`);
+  
+  for (let batchIndex = 0; batchIndex < totalBatches; batchIndex++) {
+    const startIdx = batchIndex * BATCH_SIZE;
+    const endIdx = Math.min(startIdx + BATCH_SIZE, pendingTasks.length);
+    const batch = pendingTasks.slice(startIdx, endIdx);
+    
+    console.log(`📦 Processing batch ${batchIndex + 1}/${totalBatches} (${batch.length} tasks)...`);
+    SpreadsheetApp.getActive().toast(`📦 Batch ${batchIndex + 1}/${totalBatches} (${batch.length} tasks)...`);
+    
+    // Prepare batch for submission
+    const toResubmit = batch.map(t => ({
+      keyword: t.keyword,
+      lat: t.lat,
+      lng: t.lng,
+      row: t.sourceRow
+    }));
+    
+    // Submit this batch
+    const newTaskIds = submitBatchRankingJobs(toResubmit);
+    
+    if (!newTaskIds || newTaskIds.length === 0) {
+      console.error(`❌ Batch ${batchIndex + 1} failed - no task IDs returned`);
+      totalFailed += batch.length;
+      // Continue with next batch instead of stopping
+      continue;
+    }
+    
+    if (newTaskIds.length !== batch.length) {
+      console.warn(`⚠️ Batch ${batchIndex + 1}: Submitted ${newTaskIds.length} tasks but expected ${batch.length}`);
+    }
+    
+    // Update logs with new task IDs for this batch
+    const now = new Date();
+    for (let i = 0; i < Math.min(newTaskIds.length, batch.length); i++) {
+      const logRow = batch[i].logIndex;
+      logs.getRange(logRow, 1).setValue(newTaskIds[i]); // A: Job ID
+      logs.getRange(logRow, 4).setValue('RE-SUBMITTED'); // D: status
+      logs.getRange(logRow, 5).setValue(now); // E: submitted timestamp
+      allNewTaskIds.push(newTaskIds[i]);
+    }
+    
+    totalSubmitted += newTaskIds.length;
+    console.log(`✅ Batch ${batchIndex + 1}/${totalBatches} complete: ${newTaskIds.length} tasks submitted`);
+    
+    // Small delay between batches to avoid rate limits (optional)
+    if (batchIndex < totalBatches - 1) {
+      Utilities.sleep(1000); // 1 second delay between batches
+    }
+  }
+  
+  console.log(`✅ Resubmission complete: ${totalSubmitted} submitted, ${totalFailed} failed`);
+  
+  if (totalSubmitted === 0) {
+    SpreadsheetApp.getUi().alert('❌ Resubmit Failed', 'All batches failed. Check console logs for details.', SpreadsheetApp.getUi().ButtonSet.OK);
+    return;
+  }
+  
+  // Step 3: Ensure fetch scheduler is running (5 minutes hardcoded)
+  // Skip immediate fetch - tasks need 5+ minutes to process, scheduler will handle it
+  if (totalSubmitted > 0) {
+    console.log(`⏰ Creating fetch scheduler (5 minutes) to fetch ${totalSubmitted} resubmitted tasks...`);
+    
+    // Remove any existing fetch triggers first
+    const existingTriggers = ScriptApp.getProjectTriggers().filter(t => t.getHandlerFunction() === 'fetchScheduled');
+    for (let i = 0; i < existingTriggers.length; i++) {
+      ScriptApp.deleteTrigger(existingTriggers[i]);
+    }
+    
+    // Create new fetch trigger with 5 minutes hardcoded
+    ScriptApp.newTrigger('fetchScheduled').timeBased().everyMinutes(5).create();
+    console.log(`✅ Fetch scheduler created (runs every 5 minutes)`);
+  }
+  
+  // Summary
+  const summary = `Retry Complete:\n` +
+    `📤 Resubmitted: ${totalSubmitted} tasks\n` +
+    (totalFailed > 0 ? `❌ Failed: ${totalFailed} tasks\n` : '') +
+    `📝 Status: RE-SUBMITTED\n` +
+    `⏰ Fetch scheduler created (5 minutes)\n\n` +
+    `Tasks will be fetched automatically by the scheduler.`;
+  
+  SpreadsheetApp.getUi().alert('🔄 Retry Complete', summary, SpreadsheetApp.getUi().ButtonSet.OK);
+  SpreadsheetApp.getActive().toast(`✅ Retry: ${totalSubmitted} resubmitted, scheduler active (5 min)`);
+  sheet.getRange(1, 14).setValue(`✅ Retry: ${totalSubmitted} resubmitted, scheduler active (5 min)`);
+  
+  console.log(summary);
+}
+
+/**
+ * Mark tasks as failed if they've been pending too long
+ * Reads timeout hours from config sheet (default: 24 hours)
+ * @returns {number} Number of tasks marked as failed
+ */
+function markTimedOutTasks() {
+  const logs = getLogsSheet();
+  const lastRow = logs.getLastRow();
+  if (lastRow < 2) return 0;
+  
+  // Read timeout from config (default 24 hours)
+  const timeoutHours = readTimeoutHoursFromConfig();
+  const timeoutMs = timeoutHours * 60 * 60 * 1000;
+  const now = new Date().getTime();
+  
+  const rows = logs.getRange(2, 1, lastRow - 1, 6).getValues(); // A..F
+  let markedFailed = 0;
+  
+  for (let i = 0; i < rows.length; i++) {
+    const status = rows[i][3]; // D: status
+    const submittedAt = rows[i][4]; // E: submitted timestamp
+    const completedAt = rows[i][5]; // F: completed timestamp
+    
+    // Only check pending/submitted tasks that haven't been completed
+    // Skip "no_results" - task is complete, just no rankings found
+    if (status !== 'fetched' && status !== 'failed' && status !== 'no_results' && submittedAt) {
+      const submittedTime = submittedAt instanceof Date ? submittedAt.getTime() : new Date(submittedAt).getTime();
+      const timeSinceSubmission = now - submittedTime;
+      
+      if (timeSinceSubmission > timeoutMs) {
+        logs.getRange(i + 2, 4).setValue('failed'); // D: status
+        markedFailed++;
+        console.log(`⏰ Marked task as failed (timeout): Row ${i + 2}, submitted ${Math.round(timeSinceSubmission / (60 * 60 * 1000))} hours ago`);
+      }
+    }
+  }
+  
+  if (markedFailed > 0) {
+    console.log(`⏰ Marked ${markedFailed} tasks as failed due to timeout (${timeoutHours} hours)`);
+  }
+  
+  return markedFailed;
+}
+
+/**
+ * Read timeout hours from config sheet
+ * Default: 24 hours
+ * @returns {number} Timeout in hours
+ */
+function readTimeoutHoursFromConfig() {
+  try {
+    const cfg = getConfigSheet();
+    // Check column D (row 2) for timeout hours
+    const val = Number(cfg.getRange(2, 4).getValue());
+    if (Number.isFinite(val) && val > 0 && val <= 168) { // Max 1 week
+      return Math.floor(val);
+    }
+  } catch (e) {
+    console.log('Using default timeout: 24 hours');
+  }
+  return 24; // Default: 24 hours
+}
+
+/**
+ * Enhanced fetch with better logging and proper status handling
+ * V1.2: Handles "no_results" status - marks as "no_results" and writes "Not Found" to ranking_results
+ * Can be called from fetchScheduled or used independently
+ */
+function fetchWithEnhancedLogging() {
+  const sheet = SpreadsheetApp.getActive().getSheetByName('kw_variants') || SpreadsheetApp.getActiveSheet();
+  const logs = getLogsSheet();
+  
+  const lastRow = logs.getLastRow();
+  if (lastRow < 2) {
+    SpreadsheetApp.getActive().toast('❌ No submitted tasks found in logs');
+    sheet.getRange(1, 14).setValue('❌ No submitted tasks');
+    return;
+  }
+  
+  const rows = logs.getRange(2, 1, lastRow - 1, 6).getValues(); // A..F
+  let fetched = 0;
+  let pending = 0;
+  let noResults = 0;
+  let totalConsidered = 0;
+  const logDetails = [];
+  
+  for (let i = 0; i < rows.length; i++) {
+    const taskId = rows[i][0]; // A: Job IDs
+    const keyword = rows[i][1]; // B: Keyword
+    const sourceRow = rows[i][2]; // C: Source Row
+    const status = rows[i][3]; // D: status
+    const completedAt = rows[i][5]; // F: completed timestamp
+    if (!taskId) continue;
+    if (status === 'fetched' && completedAt) continue; // already done
+    if (status === 'no_results') continue; // already marked as no results, skip
+    totalConsidered++;
+    
+    const res = fetchKeywordRankingResults(taskId, keyword);
+    
+    // Check status first to handle "no_results" properly
+    if (res && res.status === 'no_results') {
+      // Task is complete but no rankings found - mark as "no_results" and write "Not Found"
+      const kw = String(keyword || '').trim();
+      
+      // Handle targetRow
+      let targetRow = null;
+      if (sourceRow) {
+        if (sourceRow instanceof Date) {
+          const excelEpoch = new Date(1899, 11, 30);
+          const daysDiff = Math.floor((sourceRow.getTime() - excelEpoch.getTime()) / (1000 * 60 * 60 * 24));
+          targetRow = daysDiff >= 1 ? daysDiff + 1 : null;
+        } else {
+          const numRow = Number(sourceRow);
+          if (numRow >= 2 && Number.isFinite(numRow)) {
+            targetRow = Math.floor(numRow);
+          }
+        }
+      }
+      
+      // Write "Not Found" to ranking_results
+      writeSingleRankingResult(sheet, 2, {
+        ranking: 'Not Found',
+        url: 'Not Found',
+        keyword: kw
+      }, targetRow);
+      
+      logs.getRange(i + 2, 4).setValue('no_results'); // D: status
+      logs.getRange(i + 2, 6).setValue(new Date()); // F: completed timestamp
+      noResults++;
+      logDetails.push(`❌ ${kw}: No results found`);
+      console.log(`❌ No results found for: ${kw}`);
+      
+    } else if (res && res.rankings && res.rankings.length > 0) {
+      // Rankings found - write result
+      const best = res.rankings.reduce((b, c) => (c.rank < b.rank ? c : b));
+      const kw = String(keyword || '').trim();
+      
+      // Handle targetRow (same logic as fetchScheduled)
+      let targetRow = null;
+      if (sourceRow) {
+        if (sourceRow instanceof Date) {
+          const excelEpoch = new Date(1899, 11, 30);
+          const daysDiff = Math.floor((sourceRow.getTime() - excelEpoch.getTime()) / (1000 * 60 * 60 * 24));
+          targetRow = daysDiff >= 1 ? daysDiff + 1 : null;
+        } else {
+          const numRow = Number(sourceRow);
+          if (numRow >= 2 && Number.isFinite(numRow)) {
+            targetRow = Math.floor(numRow);
+          }
+        }
+      }
+      
+      // Check if already processed
+      if (targetRow && hasActualResultsAtRow(targetRow)) {
+        const rs = getOrCreateRankingResultsSheet();
+        const existingKeyword = String(rs.getRange(targetRow, 3).getValue() || '').trim();
+        if (existingKeyword === kw) {
+          logs.getRange(i + 2, 4).setValue('fetched');
+          logs.getRange(i + 2, 6).setValue(new Date());
+          continue;
+        }
+      } else if (!targetRow && kw && keywordAlreadyProcessed(kw)) {
+        logs.getRange(i + 2, 4).setValue('fetched');
+        logs.getRange(i + 2, 6).setValue(new Date());
+        continue;
+      }
+      
+      // Write result
+      writeSingleRankingResult(sheet, 2, {
+        ranking: best.rank,
+        url: best.url,
+        keyword: kw
+      }, targetRow);
+      
+      logs.getRange(i + 2, 4).setValue('fetched');
+      logs.getRange(i + 2, 6).setValue(new Date());
+      fetched++;
+      logDetails.push(`✅ ${kw}: Rank ${best.rank}`);
+      
+    } else {
+      // Still processing or error - keep as pending
+      let reason = 'No results yet';
+      if (res && res.status === 'error') {
+        reason = `API Error: ${res.error || 'Unknown'}`;
+      }
+      
+      logs.getRange(i + 2, 4).setValue('pending'); // D: status
+      pending++;
+      logDetails.push(`⏳ ${keyword || taskId}: ${reason}`);
+      console.log(`⏳ Pending - ${keyword || taskId}: ${reason}`);
+    }
+  }
+  
+  // Mark timed out tasks
+  const timedOut = markTimedOutTasks();
+  
+  SpreadsheetApp.getActive().toast(`ℹ️ Fetch complete | Fetched: ${fetched} | No Results: ${noResults} | Pending: ${pending} | Failed: ${timedOut}`);
+  sheet.getRange(1, 14).setValue(`ℹ️ Fetch: ${fetched} fetched, ${noResults} no results, ${pending} pending, ${timedOut} failed`);
+  
+  // Log details to console
+  console.log(`📊 Fetch Summary: ${fetched} fetched, ${noResults} no results, ${pending} pending, ${timedOut} failed`);
+  if (logDetails.length > 0) {
+    console.log('Details:', logDetails.slice(0, 10).join(', ')); // Log first 10
+  }
+}
+
