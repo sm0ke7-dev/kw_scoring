@@ -36,21 +36,13 @@ function getGDataRangeValues(sheet) {
  * Write values to a column by header name
  * Creates column if it doesn't exist
  * Applies light green background to output
- * NOTE: Scoring columns always start at column E (index 4) to preserve A-D for ranking data
  */
 function writeGColumnByHeader(sheet, headerName, values, headerRowIndex = 1) {
   const header = getGHeaderRow(sheet);
   let colIndex = header.findIndex(h => normalizeGKey(h) === normalizeGKey(headerName));
   if (colIndex === -1) {
-    // append new column, but ensure it's at least column E (index 4)
-    // Columns A-D are reserved for: Ranking Position, Ranking URL, Keyword, Service/Niche
-    colIndex = Math.max(header.length, 4);
-    
-    // Pad header array if needed to reach column E
-    while (header.length < colIndex) {
-      header.push('');
-    }
-    
+    // append new column
+    colIndex = header.length;
     header.push(headerName);
     sheet.getRange(1, 1, 1, header.length).setValues([header]);
   }
